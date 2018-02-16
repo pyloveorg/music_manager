@@ -1,6 +1,7 @@
 {% extends "_base.html" %}
-
 {% set page_id = 'register' %}
+
+{% block title %}REJESTRACJA{% endblock %}
 
 {% block content %}
   <div class="row">
@@ -10,6 +11,37 @@
       <h3>Rejestracja</h3>
     </div>
 
-    <div class="col-2"></div>
+    <div class="row">
+        <div class="col s10 offset-s1">
+          <form action="/register" method="POST" class="top-margin">
+               {% if error_register %}
+                   <p class="error"><strong>Error:</strong> {{ error_register }}
+               {% endif %}
+
+
+               <div class="input-group">
+                   <span class="input-group-addon">Podaj login </span>
+                   <input type="text" class="form-control" name="username" id="username">
+               </div>
+               <br>
+               <div class="input-group">
+                   <span class="input-group-addon">Podaj hasło </span>
+                   <input type="password" class="form-control" id="password" name="password">
+               </div>
+               <br>
+               <div class="input-group">
+                   <span class="input-group-addon">Podaj podnownie hasło </span>
+                   <input type="password" class="form-control" id="password_veirfy" name="password_verify">
+               </div>
+               <br>
+               <div class="input-group">
+                   <span class="input-group-addon">Podaj mail </span>
+                   <input type="text" class="form-control" id="email" name="email">
+               </div>
+               <br>
+              <button class="btn waves-effect waves-light custom-green" type="submit" name="action" value="login">Zarejestruj się</button>
+           </form>
+        </div>
+    </div>
   </div>
 {% endblock %}
