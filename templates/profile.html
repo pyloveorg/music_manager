@@ -1,0 +1,9 @@
+{% extends "_base.html" %}
+{% set page_id = 'profile' %}
+
+{% block title %}PROFIL{% endblock %}
+
+{% block content %}
+    Username: {{ session['username'] }}
+    {{ tekst }}
+{% endblock %}
