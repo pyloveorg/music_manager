@@ -1,0 +1,15 @@
+{% extends "_base.html" %}
+{% set page_id = 'record' %}
+{% block title %} {{ record.artist }} - {{ record.title }} {% endblock %}
+{% block content %}
+{% if record %}
+<div class="row">
+	<div class="col-12">
+		<h1 class="h2 mt-3 mb-3">
+			{{ record.artist }} - {{ record.title }}
+		</h1>
+	</div>
+</div>
+{% include '_record-api-details.html' %}
+{% endif %}
+{% endblock %}

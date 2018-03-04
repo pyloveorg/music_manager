@@ -1,0 +1,123 @@
+{% if api_data %}
+
+<div class="row">
+	<div class="col-12">
+		<h2 class="h4 mb-3 mt-5">Informacje dodatkowe</h2>
+		<hr>
+	</div>
+	<div class="col-6">
+		<div class="media">
+			{% if api_data.thumb %}
+			<img class="mr-3" src="{{ api_data.thumb }}" alt="{{ record.artist }} - {{ record.title }}" />
+			{% endif %}
+			<div class="media-body">
+				{% if api_data %}
+				{% if api_data.notes %}
+				<p>{{ api_data.notes | truncate(400) }}</p>
+				{% if api_data.notes | count >  400 %}
+				<a class="btn btn-sm btn-secondary" href="{{ api_data.uri }}" target="_blank">więcej</a>
+				{% endif %}
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="col-6">
+		<dl>
+			{% if api_data.year %}
+			<dt class="d-inline-flex">Rok wydania: </dt>
+			<dd class="d-inline-flex">{{ api_data.year }}</dd>
+			{% endif %}
+
+            {% if api_data.labels %}
+			<dt>Wydawnictwo:</dt>
+			{% for label in api_data.labels %}
+			<dd class="d-inline-flex">
+				{{ label.name }}
+			</dd>
+			{% endfor %}
+			{% endif %}
+
+			{% if api_data.genre %}
+			<dt>Gatunek:</dt>
+			{% for genre in api_data.genres %}
+			<dd class="d-inline-flex">
+				<span class="badge badge-secondary">
+				{{ genre }}
+				</span>
+			</dd>
+			{% endfor %}
+			{% endif %}
+
+			{% if api_data.style %}
+			<dt>Styl:</dt>
+			{% for style in api_data.styles %}
+			<dd class="d-inline-flex">
+				<span class="badge badge-secondary">
+				{{ style }}
+				</span>
+			</dd>
+			{% endfor %}
+			{% endif %}
+
+			{% if api_data.format %}
+			<dt>Format:</dt>
+			{% for format in api_data.format %}
+			<dd class="d-inline-flex">
+				<span class="badge badge-dark">
+				{{ format }}
+				</span>
+			</dd>
+			{% endfor %}
+			{% endif %}
+		</dl>
+	</div>
+</div>
+<div class="row mt-5 mb-5">
+	{% if api_data.tracklist %}
+	<div class="col-6">
+		<h3 class="h5">Lista utworów:</h3>
+		<ul class="list-group list-group-flush">
+			{% for track in api_data.tracklist %}
+			<li class="list-group-item p-1 d-flex justify-content-between">
+				{{ track.position }}. {{ track.title }}  <i>{{ track.duration }}</i>
+			</li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+	</div>
+	{% endif %}
+
+{% if api_data.videos %}
+	<div class="col-6">
+		<h2 class="h5">Wideo:</h2>
+		<ul class="list-unstyled">
+        {% for video in api_data.videos %}
+            {% set id = video.uri.split('v=')[1] %}
+			<li class="media mb-3">
+	            <a class="mr-3" href="{{ video.uri }}" target="_blank">
+	                <img class="rounded"
+	                     src="https://i.ytimg.com/vi/{{ id }}/default.jpg"
+	                     alt="{{ video.title }}"
+	                width="120"
+	                height="90" />
+	            </a>
+				<div class="media-body">
+					<a class="text-dark" href="{{ video.uri }}" target="_blank">
+						{{ video.title }}
+						<span class="badge badge-secondary">
+							{{'%0.2f'| format( video.duration / 60 | float) | replace('.', ':') }}
+						</span>
+					</a>
+				</div>
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+{% endif %}
+</div>
+<div class="row mb-5 text-right">
+	<div class="col-12">
+        <small>Źródło: <a href="https://www.discogs.com" target="_blank">discogs.com</a></small>
+	</div>
+</div>
+{% endif %}
