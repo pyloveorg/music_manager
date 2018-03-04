@@ -2,7 +2,7 @@
 
 from flask import url_for, render_template, request, redirect, session
 from main import app, db, bcrypt
-from models import User
+from models import User, Record
 
 
 class ServerError(Exception):
@@ -90,11 +90,23 @@ def register():
         except ServerError as err:
             error_register = str(err)
 
-    return render_template('register.html', error_register=error_register)
+        return render_template('register.html', error_register=error_register)
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
     return render_template('register.html')
+
+
+@app.route('/records/', methods=['GET'])
+def get_records():
+    records = Record.query.all()
+    return render_template('record-list.html', records=records)
+
+
+@app.route('/records/<int:id>', methods=['GET'])
+def get_record(id):
+    record = Record.query.get(id)
+    api_data = record.get_additional()
+    return render_template('record.html', record=record, api_data=api_data)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
