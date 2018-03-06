@@ -31,5 +31,15 @@ def db_start():
     db.session.add(user_2)
     db.session.commit()
 
+    record_1 = models.Record(title='Black Sabbath', artist='Black Sabbath')
+    record_2 = models.Record(title='The Doors', artist='The Doors')
+    record_3 = models.Record(title='Led Zeppelin', artist='Led Zeppelin')
+    record_4 = models.Record(title='Ramones', artist='Ramones')
+    db.session.add(record_1)
+    db.session.add(record_2)
+    db.session.add(record_3)
+    db.session.add(record_4)
+    db.session.commit()
+
 if __name__ == '__main__':
     db_start()
