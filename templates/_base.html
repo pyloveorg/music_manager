@@ -2,30 +2,15 @@
 <html lang=en>
 <meta charset=utf-8>
 <head>
-  <title>XxX</title>
+  <title>{% block title %}Music manager{% endblock %}</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="/static/css/my_style.css" >
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">PyLove</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
-            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item{% if page_id == 'info' %} active{% endif %}">
-          <a class="nav-link" href="{{ url_for('info') }}">Info</a>
-        </li>
-        <li class="nav-item{% if page_id == 'register' %} active{% endif %}">
-          <a class="nav-link" href="#">Rejestracja</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+  {% include '_menu.html' %}
 
   <div class="container">
     <div class="row">
