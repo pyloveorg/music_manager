@@ -8,7 +8,7 @@ from main import db
 import requests
 
 
-#UserMixin
+# UserMixin
 class User(db.Model):
     """
     User model for reviewers.
@@ -77,7 +77,7 @@ class Record(db.Model):
             data = response.json().get('results')[0]
             details = requests.get(data.get('resource_url')).json()
             data.update(details)
-            if (data):
+            if data:
                 result = data
             else:
                 response.raise_for_status()

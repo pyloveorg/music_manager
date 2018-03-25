@@ -6,6 +6,7 @@ from models import User, Record
 
 app.secret_key = 'some_secret'
 
+
 class ServerError(Exception):
     """wyjątek zostanie zwrócony, gdy cokolwiek będzie nieprawidłowe"""
     pass

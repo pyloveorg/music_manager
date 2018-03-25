@@ -41,5 +41,6 @@ def db_start():
     db.session.add(record_4)
     db.session.commit()
 
+
 if __name__ == '__main__':
     db_start()
