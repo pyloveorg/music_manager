@@ -1,8 +1,10 @@
 """music_manager project"""
 
-from flask import url_for, render_template, request, redirect, session
+from flask import url_for, render_template, request, redirect, session, flash
 from main import app, db, bcrypt
 from models import User, Record
+
+app.secret_key = 'some_secret'
 
 
 class ServerError(Exception):
@@ -104,7 +106,13 @@ def get_records():
 @app.route('/records/<int:id>', methods=['GET'])
 def get_record(id):
     record = Record.query.get(id)
+    if not record:
+        flash('Nie odnaleziono albumu: {}'.format(id), category='danger')
+        return redirect('/records')
     api_data = record.get_additional()
+    error = api_data.get('error', '')
+    if error:
+        flash(error, category='warning')
     return render_template('record.html', record=record, api_data=api_data)
 
 

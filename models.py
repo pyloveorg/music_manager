@@ -8,7 +8,7 @@ from main import db
 import requests
 
 
-#UserMixin
+# UserMixin
 class User(db.Model):
     """
     User model for reviewers.
@@ -65,10 +65,26 @@ class Record(db.Model):
             'artist': self.artist,
             'type': 'master'
         }
-        data = requests.get(url, params=params).json().get('results')[0]
-        details = requests.get(data.get('resource_url')).json()
-        data.update(details)
-        return data
+        result = {
+            'error': ''
+        }
+        response = requests.get(url, params=params)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            result['error'] = str(e)
+        try:
+            data = response.json().get('results')[0]
+            details = requests.get(data.get('resource_url')).json()
+            data.update(details)
+            if data:
+                result = data
+            else:
+                response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            result['error'] = str(e)
+        finally:
+            return result
 
 
 class List(db.Model):
