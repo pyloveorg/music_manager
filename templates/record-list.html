@@ -10,6 +10,17 @@
             {% for record in records %}
             <li class="p-1">
                 <a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title }}</a>
+                <form class="form-inline formtypelist">
+                  <div class="form-group">
+                    <label for="selectListType">Wybierz typ widoczności listy:</label>
+                    <select class="form-control mx-2" id="selectListType">
+                      <option>Publiczna</option>
+                      <option>Prywatna</option>
+                      <option>Tylko dla znajomych</option>
+                    </select>
+                  </div>
+                    <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
+                </form>
             </li>
             {% endfor %}
         </ul>

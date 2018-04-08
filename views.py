@@ -66,7 +66,6 @@ def register():
         new_username = request.form.get('username')
         new_password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
         new_password_verify = request.form.get('password_verify')
-
         new_email = request.form.get('email')
 
         try:

@@ -1,3 +1,12 @@
 pre {
     white-space: pre-wrap;
 }
+
+/* lista albumów */
+.formtypelist {
+    display: -webkit-inline-box;
+    display: -moz-inline-box;
+    display: -ms-inline-flexbox;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+}
