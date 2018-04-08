@@ -3,6 +3,7 @@
 {% block title %} Lista albumów {% endblock %}
 {% block content %}
 
+{% if session['username'] %}
 <!-- Przycisk uruchamiający modal dla DODAJ -->
 <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
   Dodaj album
@@ -13,7 +14,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="myModalLabel">Dodaj album zzzzzzz</h4>
+        <h4 class="modal-title" id="myModalLabel">Dodaj album</h4>
       </div>
       <form action="/records/" method="post">
           <div class="modal-body">
@@ -29,10 +30,10 @@
     </div>
   </div>
 </div>
-
+{% endif  %}
 <div class="row">
  {{ error }}
-    <table border>
+    <table >
         <div class="col-12">
             <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
 
@@ -45,6 +46,7 @@
                     <a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title }}</a>
                 </li>
                 </td>
+                {% if session['username'] %}
                 <td >
                     <!-- Przycisk uruchamiający modal dla EDYTUJ -->
                           <button data-toggle="modal" data-target="#myModal2{{record.id}}">
@@ -79,6 +81,7 @@
                         <button type="submit">Usuń</button>
                     </form>
                 </td>
+                {% endif %}
                 </tr>
                 {% endfor %}
             </ul>
