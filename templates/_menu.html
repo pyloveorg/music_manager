@@ -27,4 +27,9 @@
             {% endif %}
         </ul>
     </div>
+    {% if session['username'] %}
+    <div style="color:white; " class="collapse navbar-collapse">
+        Witaj {{session.username}}!
+    </div>
+    {% endif %}
 </nav>

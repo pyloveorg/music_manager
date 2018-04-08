@@ -11,10 +11,10 @@ class ServerError(Exception):
     """wyjątek zostanie zwrócony, gdy cokolwiek będzie nieprawidłowe"""
     pass
 
+
 @app.route('/', methods=['GET', 'POST'])
 def info():
     return render_template('info.html')
-
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,6 +100,45 @@ def register():
 def get_records():
     records = Record.query.all()
     return render_template('record-list.html', records=records)
+
+
+@app.route('/records/', methods=['POST'])
+def new_record():
+    new_artist = request.form.get('artist')
+    new_title = request.form.get('title')
+
+    if new_artist == '' or new_title == '':
+        error = "Wypełnij pola!"
+        records = Record.query.all()
+        return render_template('record-list.html', error=error, records=records)
+
+    new_record = Record(title=new_title, artist=new_artist)
+    db.session.add(new_record)
+    db.session.commit()
+    return redirect('/records/')
+
+
+@app.route('/records/edit', methods=['POST'])
+def edit_record():
+    edit_id = request.form.get("edit_id")
+    edit_artist = request.form.get("artist")
+    edit_title = request.form.get("title")
+
+    record_to_edit=Record.query.get(edit_id)
+
+    record_to_edit.artist = edit_artist
+    record_to_edit.title = edit_title
+    db.session.commit()
+    return redirect('/records/')
+
+
+@app.route("/delete_record", methods=["POST"])
+def delete_record():
+    id_delete = request.form.get("id_delete")
+    delete_record=Record.query.get(id_delete)
+    db.session.delete(delete_record)
+    db.session.commit()
+    return redirect('/records/')
 
 
 @app.route('/records/<int:id>', methods=['GET'])
