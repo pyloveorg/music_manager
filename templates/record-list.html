@@ -2,18 +2,88 @@
 {% set page_id = 'records' %}
 {% block title %} Lista albumów {% endblock %}
 {% block content %}
-<div class="row">
-	<div class="col-12">
-        <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
-        {% if records %}
-        <ul class="list-unstyled">
-            {% for record in records %}
-            <li class="p-1">
-                <a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title }}</a>
-            </li>
-            {% endfor %}
-        </ul>
+
+<!-- Przycisk uruchamiający modal dla DODAJ -->
+<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  Dodaj album
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Dodaj album zzzzzzz</h4>
+      </div>
+      <form action="/records/" method="post">
+          <div class="modal-body">
+              <input type="hidden" name="new_id_hidden"><br>
+              Artysta: <input type="text" name="artist" required><br>
+              Tytuł albumu:    <input type="text" name="title" required><br>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+              <button type="submit" class="btn btn-default" name="formularz" value="1">Dodaj album</button>
+          </div>
+      </form>
     </div>
+  </div>
+</div>
+
+<div class="row">
+ {{ error }}
+    <table border>
+        <div class="col-12">
+            <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
+
+            {% if records %}
+            <ul class="list-unstyled">
+                {% for record in records %}
+                <tr>
+                <td>
+                <li class="p-1">
+                    <a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title }}</a>
+                </li>
+                </td>
+                <td >
+                    <!-- Przycisk uruchamiający modal dla EDYTUJ -->
+                          <button data-toggle="modal" data-target="#myModal2{{record.id}}">
+                              Edytuj
+                          </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="myModal2{{record.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel">Edytuj album</h4>
+                          </div>
+                          <form action="/records/edit" method="post">
+                            <div class="modal-body">
+                                <input type="hidden" name="edit_id" value="{{record.id}}"><br>
+                                    Artysta: <input type="text" name="artist" required value="{{record.artist}}"><br>
+                                    Tytuł albumu:    <input type="text" name="title" required value="{{record.title}}"><br>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                                <button type="submit" class="btn btn-default" name="formularz">Edytuj album</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                </td>
+                <td >
+                    <form action="/delete_record" method="post">
+                        <input type="hidden" value="{{record.id}}" name="id_delete" />
+                        <button type="submit">Usuń</button>
+                    </form>
+                </td>
+                </tr>
+                {% endfor %}
+            </ul>
+        </div>
+    </table>
 </div>
 {% endif %}
 {% endblock %}
