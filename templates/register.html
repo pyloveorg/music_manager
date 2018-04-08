@@ -20,25 +20,24 @@
                    <p class="error"><strong>Error:</strong> {{ error_register }}
                {% endif %}
 
-
                <div class="input-group">
                    <span class="input-group-addon">Podaj login </span>
-                   <input type="text" class="form-control" name="username" id="username">
+                   <input minlength="4" maxlength="20"  required type="text" class="form-control" name="username" id="username">
                </div>
                <br>
                <div class="input-group">
                    <span class="input-group-addon">Podaj hasło </span>
-                   <input type="password" class="form-control" id="password" name="password">
+                   <input required type="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Hasło musi zawierać conajmniej jedną cyfrę, jedną dużą i małą literę i conajmniej 8 znaków" class="form-control" id="password" name="password">
                </div>
                <br>
                <div class="input-group">
                    <span class="input-group-addon">Podaj podnownie hasło </span>
-                   <input type="password" class="form-control" id="password_veirfy" name="password_verify">
+                   <input  required type="text" class="form-control" id="password_veirfy" name="password_verify">
                </div>
                <br>
                <div class="input-group">
                    <span class="input-group-addon">Podaj mail </span>
-                   <input type="text" class="form-control" id="email" name="email">
+                   <input minlength="5" maxlength="254" required type="email" class="form-control" id="email" name="email">
                </div>
                <br>
               <button class="btn waves-effect waves-light custom-green" type="submit" name="action" value="login">Zarejestruj się</button>
