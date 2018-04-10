@@ -8,7 +8,7 @@ from main import db
 import requests
 
 
-#UserMixin
+# UserMixin
 class User(db.Model):
     """
     User model for reviewers.
@@ -38,6 +38,7 @@ class User(db.Model):
         return self.admin
 
 
+
 record_list = db.Table('record_list', db.metadata,
     Column('record_id', Integer, db.ForeignKey('record.id')),
     Column('list_id', Integer, db.ForeignKey('list.id'))
@@ -65,10 +66,26 @@ class Record(db.Model):
             'artist': self.artist,
             'type': 'master'
         }
-        data = requests.get(url, params=params).json().get('results')[0]
-        details = requests.get(data.get('resource_url')).json()
-        data.update(details)
-        return data
+        result = {
+            'error': ''
+        }
+        response = requests.get(url, params=params)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            result['error'] = str(e)
+        try:
+            data = response.json().get('results')[0]
+            details = requests.get(data.get('resource_url')).json()
+            data.update(details)
+            if data:
+                result = data
+            else:
+                response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            result['error'] = str(e)
+        finally:
+            return result
 
 
 class List(db.Model):
@@ -95,6 +112,26 @@ class Rating(db.Model):
     record_id = Column(Integer, db.ForeignKey('record.id'), nullable=True)
     review_id = Column(Integer, db.ForeignKey('review.id'), nullable=True)
 
+    # def save_rating(self, u_id, rate, rec_id, rev_id):
+    #     r = Rating()
+    #     r.user_id = u_id
+    #     r.rate = rate
+    #     r.record_id = rec_id
+    #     r.review_id = rev_id
+    #     db.session.add(r)
+    #     db.session.commit()
+    #
+    # def get_avg_rat(self, rec_id):
+    #     r = Rating.query.filter_by(record_id=rec_id).all()
+    #     # r.rate
+    #     r_sum = 0
+    #     cnt = 0
+    #     for i, v in enumerate(r):
+    #         r_sum += v.rate
+    #         cnt += 1
+    #     return r_sum / cnt
+    #     # pass
+
 
 class Review(db.Model):
     """
@@ -106,6 +143,19 @@ class Review(db.Model):
     user_id = Column(Integer, db.ForeignKey('user.id'), nullable=False)
     record_id = Column(Integer, db.ForeignKey('record.id'), nullable=False)
     ratings = db.relationship('Rating', backref='review')
+
+    # def save_review(self, review, rec_id, usr_id):
+    #     r = Review()
+    #     r.record_id = rec_id
+    #     r.user_id = usr_id
+    #     r.review = review
+    #
+    #     pass
+    #
+    # def get_reviews(self, rec_id):
+    #     r = Review.query.filter_by(record_id=rec_id).all()
+    #     return r
+
 
 
 class Friend(db.Model):
