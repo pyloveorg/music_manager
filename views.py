@@ -2,7 +2,8 @@
 
 from flask import url_for, render_template, request, redirect, session
 from main import app, db, bcrypt
-from models import User, Record
+from models import User, Record, Review, Rating  # KZ
+from sqlalchemy import func
 
 
 class ServerError(Exception):
@@ -105,11 +106,78 @@ def get_records():
 def get_record(id):
     record = Record.query.get(id)
     api_data = record.get_additional()
-    return render_template('record.html', record=record, api_data=api_data)
+
+    # k
+    reviews = db.session.query(Review).filter(Review.record_id == id)
+
+    rating_avg = db.session.query(func.avg(Rating.rate)).filter(Rating.record_id == id).scalar()
+
+    rating_count = db.session.query(Rating.rate).filter(Rating.record_id == id).count()
+
+    u = db.session.query(User).all()
+
+    rats = db.session.query(Rating).filter(Rating.record_id == id)
+    # k
+
+    return render_template('record.html', record=record, api_data=api_data, reviews=reviews, avg_rat=rating_avg,
+                           rat_count=rating_count, users=u, rats=rats)
 
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+
+# kz
+@app.route('/review/<int:id>', methods=['POST'])
+def save_review(id):
+    # rat = request.form['score']
+    rev_txt = request.form['ratingTxt']
+
+    u_name = session['username']
+    u = db.session.query(User.id).filter(User.username == u_name).scalar()
+
+    rev = Review(review=rev_txt, user_id=u, record_id=id)
+    db.session.add(rev)
+    # db.session.merge(rev)
+    # db.session.flush()
+    # rev_id = rev.id
+    # rating = Rating(rate=rat, user_id=u, record_id=id)  # , review_id=rev_id)
+    # db.session.add(rating)
+    db.session.commit()
+
+    record = Record.query.get(id)
+    api_data = record.get_additional()
+    return redirect(url_for('get_record', id=id))
+
+
+@app.route('/rating/<int:id>', methods=['POST'])
+def save_rating(id):
+    rat = request.form['score']
+    u_name = session['username']
+    u = db.session.query(User.id).filter(User.username == u_name).scalar()
+    rating = Rating(rate=rat, user_id=u, record_id=id)  # , review_id=rev_id)
+    db.session.add(rating)
+    db.session.commit()
+    return redirect(url_for('get_record', id=id))
+
+
+@app.route('/reviews/<int:id>', methods=['POST'])
+def get_reviews(id):
+    reviews = db.session.query(Review).filter(Review.record_id == id)
+
+    # score_sum = db.session.query(func.sum(Rating.rate).label('sum')).filter(Rating.record_id == id).scalar()
+
+    rating_avg = db.session.query(func.avg(Rating.rate)).filter(Rating.record_id == id).scalar()
+
+    rating_count = db.session.query(Rating.rate).filter(Rating.record_id == id).count()
+
+    u = db.session.query(User).all()
+
+    rats = db.session.query(Rating).filter(Rating.record_id == id)
+
+    return render_template('reviews.html', reviews=reviews, avg_rat=rating_avg, rat_count=rating_count, users=u,
+                           rats=rats)
+
 
 
