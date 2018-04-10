@@ -1,11 +1,11 @@
-{% if api_data %}
+{% if api_data and not api_data.error %}
 
 <div class="row">
 	<div class="col-12">
 		<h2 class="h4 mb-3 mt-5">Informacje dodatkowe</h2>
 		<hr>
 	</div>
-	<div class="col-6">
+	<div class="col-12 col-lg-6 mb-5">
 		<div class="media">
 			{% if api_data.thumb %}
 			<img class="mr-3" src="{{ api_data.thumb }}" alt="{{ record.artist }} - {{ record.title }}" />
@@ -21,7 +21,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-6">
+	<div class="col-12 col-lg-6 mb-5">
 		<dl>
 			{% if api_data.year %}
 			<dt class="d-inline-flex">Rok wydania: </dt>
@@ -72,9 +72,9 @@
 		</dl>
 	</div>
 </div>
-<div class="row mt-5 mb-5">
+<div class="row">
 	{% if api_data.tracklist %}
-	<div class="col-6">
+	<div class="col-12 col-lg-6 mb-5">
 		<h3 class="h5">Lista utworów:</h3>
 		<ul class="list-group list-group-flush">
 			{% for track in api_data.tracklist %}
@@ -88,7 +88,7 @@
 	{% endif %}
 
 {% if api_data.videos %}
-	<div class="col-6">
+	<div class="col-12 col-lg-6 mb-5">
 		<h2 class="h5">Wideo:</h2>
 		<ul class="list-unstyled">
         {% for video in api_data.videos %}
@@ -113,8 +113,8 @@
 			{% endfor %}
 		</ul>
 	</div>
-{% endif %}
 </div>
+{% endif %}
 <div class="row mb-5 text-right">
 	<div class="col-12">
         <small>Źródło: <a href="https://www.discogs.com" target="_blank">discogs.com</a></small>

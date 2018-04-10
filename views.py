@@ -1,19 +1,21 @@
 """music_manager project"""
 
-from flask import url_for, render_template, request, redirect, session
+from flask import url_for, render_template, request, redirect, session, flash
 from main import app, db, bcrypt
 from models import User, Record, Review, Rating  # KZ
 from sqlalchemy import func
+
+app.secret_key = 'some_secret'
 
 
 class ServerError(Exception):
     """wyjątek zostanie zwrócony, gdy cokolwiek będzie nieprawidłowe"""
     pass
 
+
 @app.route('/', methods=['GET', 'POST'])
 def info():
     return render_template('info.html')
-
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -102,12 +104,53 @@ def get_records():
     return render_template('record-list.html', records=records)
 
 
+@app.route('/records/', methods=['POST'])
+def new_record():
+    new_artist = request.form.get('artist')
+    new_title = request.form.get('title')
+
+    if new_artist == '' or new_title == '':
+        error = "Wypełnij pola!"
+        records = Record.query.all()
+        return render_template('record-list.html', error=error, records=records)
+
+    new_record = Record(title=new_title, artist=new_artist)
+    db.session.add(new_record)
+    db.session.commit()
+    return redirect('/records/')
+
+
+@app.route('/records/edit', methods=['POST'])
+def edit_record():
+    edit_id = request.form.get("edit_id")
+    edit_artist = request.form.get("artist")
+    edit_title = request.form.get("title")
+
+    record_to_edit=Record.query.get(edit_id)
+
+    record_to_edit.artist = edit_artist
+    record_to_edit.title = edit_title
+    db.session.commit()
+    return redirect('/records/')
+
+
+@app.route("/delete_record", methods=["POST"])
+def delete_record():
+    id_delete = request.form.get("id_delete")
+    delete_record=Record.query.get(id_delete)
+    db.session.delete(delete_record)
+    db.session.commit()
+    return redirect('/records/')
+
+
 @app.route('/records/<int:id>', methods=['GET'])
 def get_record(id):
     record = Record.query.get(id)
+    if not record:
+        flash('Nie odnaleziono albumu: {}'.format(id), category='danger')
+        return redirect('/records')
     api_data = record.get_additional()
 
-    # k
     reviews = db.session.query(Review).filter(Review.record_id == id)
 
     rating_avg = db.session.query(func.avg(Rating.rate)).filter(Rating.record_id == id).scalar()
@@ -121,6 +164,11 @@ def get_record(id):
 
     return render_template('record.html', record=record, api_data=api_data, reviews=reviews, avg_rat=rating_avg,
                            rat_count=rating_count, users=u, rats=rats)
+
+    error = api_data.get('error', '')
+    if error:
+        flash(error, category='warning')
+    return render_template('record.html', record=record, api_data=api_data)
 
 
 @app.errorhandler(404)

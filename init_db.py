@@ -53,11 +53,5 @@ def db_start():
     db.session.add(record_5)
     db.session.commit()
 
-    # rat_1 = models.Rating()
-    # rat_1.rate = 5
-    # rat_1.record_id = 2
-    # rat_1.review_id = 1
-
-
 if __name__ == '__main__':
     db_start()
