@@ -13,8 +13,7 @@
 
 </div>
 <div>
-        <!--<p>Liczba komentarzy:  {{ reviews.count() }} aa</p>-->
-        <p>Średnia ocena: {{ '%0.2f' % avg_rat }} / Liczba ocen:  {{ rat_count }} </p>
+        <p>Średnia ocena: {{ '%0.2f' % avg_rat | int }} / Liczba ocen:  {{ rat_count }}</p>
 </div>
 	<div>
         <form action="/rating/{{ record.id }}" method="post">
