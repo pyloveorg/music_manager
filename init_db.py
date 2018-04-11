@@ -41,6 +41,16 @@ def db_start():
     db.session.add(user_3)
     db.session.commit()
 
+    user_4 = models.User()
+    user_4.username = "admin"
+    user_4.password = bcrypt.generate_password_hash('admin')
+    user_4.email = 'ewa.pettke@gmail.com'
+    user_4.admin = True
+    user_4.poweruser = True
+
+    db.session.add(user_4)
+    db.session.commit()
+
     record_1 = models.Record(title='Black Sabbath', artist='Black Sabbath')
     record_2 = models.Record(title='The Doors', artist='The Doors')
     record_3 = models.Record(title='Led Zeppelin', artist='Led Zeppelin')
