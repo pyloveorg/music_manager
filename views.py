@@ -2,7 +2,8 @@
 
 from flask import url_for, render_template, request, redirect, session, flash
 from main import app, db, bcrypt
-from models import User, Record
+from models import User, Record, Review, Rating  # KZ
+from sqlalchemy import func
 
 app.secret_key = 'some_secret'
 
@@ -11,10 +12,10 @@ class ServerError(Exception):
     """wyjątek zostanie zwrócony, gdy cokolwiek będzie nieprawidłowe"""
     pass
 
+
 @app.route('/', methods=['GET', 'POST'])
 def info():
     return render_template('info.html')
-
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -103,6 +104,45 @@ def get_records():
     return render_template('record-list.html', records=records)
 
 
+@app.route('/records/', methods=['POST'])
+def new_record():
+    new_artist = request.form.get('artist')
+    new_title = request.form.get('title')
+
+    if new_artist == '' or new_title == '':
+        error = "Wypełnij pola!"
+        records = Record.query.all()
+        return render_template('record-list.html', error=error, records=records)
+
+    new_record = Record(title=new_title, artist=new_artist)
+    db.session.add(new_record)
+    db.session.commit()
+    return redirect('/records/')
+
+
+@app.route('/records/edit', methods=['POST'])
+def edit_record():
+    edit_id = request.form.get("edit_id")
+    edit_artist = request.form.get("artist")
+    edit_title = request.form.get("title")
+
+    record_to_edit=Record.query.get(edit_id)
+
+    record_to_edit.artist = edit_artist
+    record_to_edit.title = edit_title
+    db.session.commit()
+    return redirect('/records/')
+
+
+@app.route("/delete_record", methods=["POST"])
+def delete_record():
+    id_delete = request.form.get("id_delete")
+    delete_record=Record.query.get(id_delete)
+    db.session.delete(delete_record)
+    db.session.commit()
+    return redirect('/records/')
+
+
 @app.route('/records/<int:id>', methods=['GET'])
 def get_record(id):
     record = Record.query.get(id)
@@ -110,6 +150,21 @@ def get_record(id):
         flash('Nie odnaleziono albumu: {}'.format(id), category='danger')
         return redirect('/records')
     api_data = record.get_additional()
+
+    reviews = db.session.query(Review).filter(Review.record_id == id)
+
+    rating_avg = db.session.query(func.avg(Rating.rate)).filter(Rating.record_id == id).scalar()
+
+    rating_count = db.session.query(Rating.rate).filter(Rating.record_id == id).count()
+
+    u = db.session.query(User).all()
+
+    rats = db.session.query(Rating).filter(Rating.record_id == id)
+    # k
+
+    return render_template('record.html', record=record, api_data=api_data, reviews=reviews, avg_rat=rating_avg,
+                           rat_count=rating_count, users=u, rats=rats)
+
     error = api_data.get('error', '')
     if error:
         flash(error, category='warning')
@@ -119,5 +174,58 @@ def get_record(id):
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+
+# kz
+@app.route('/review/<int:id>', methods=['POST'])
+def save_review(id):
+    # rat = request.form['score']
+    rev_txt = request.form['ratingTxt']
+
+    u_name = session['username']
+    u = db.session.query(User.id).filter(User.username == u_name).scalar()
+
+    rev = Review(review=rev_txt, user_id=u, record_id=id)
+    db.session.add(rev)
+    # db.session.merge(rev)
+    # db.session.flush()
+    # rev_id = rev.id
+    # rating = Rating(rate=rat, user_id=u, record_id=id)  # , review_id=rev_id)
+    # db.session.add(rating)
+    db.session.commit()
+
+    record = Record.query.get(id)
+    api_data = record.get_additional()
+    return redirect(url_for('get_record', id=id))
+
+
+@app.route('/rating/<int:id>', methods=['POST'])
+def save_rating(id):
+    rat = request.form['score']
+    u_name = session['username']
+    u = db.session.query(User.id).filter(User.username == u_name).scalar()
+    rating = Rating(rate=rat, user_id=u, record_id=id)  # , review_id=rev_id)
+    db.session.add(rating)
+    db.session.commit()
+    return redirect(url_for('get_record', id=id))
+
+
+@app.route('/reviews/<int:id>', methods=['POST'])
+def get_reviews(id):
+    reviews = db.session.query(Review).filter(Review.record_id == id)
+
+    # score_sum = db.session.query(func.sum(Rating.rate).label('sum')).filter(Rating.record_id == id).scalar()
+
+    rating_avg = db.session.query(func.avg(Rating.rate)).filter(Rating.record_id == id).scalar()
+
+    rating_count = db.session.query(Rating.rate).filter(Rating.record_id == id).count()
+
+    u = db.session.query(User).all()
+
+    rats = db.session.query(Rating).filter(Rating.record_id == id)
+
+    return render_template('reviews.html', reviews=reviews, avg_rat=rating_avg, rat_count=rating_count, users=u,
+                           rats=rats)
+
 
 
