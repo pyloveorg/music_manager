@@ -2,30 +2,6 @@
 {% set page_id = 'records' %}
 {% block title %} Lista albumów {% endblock %}
 {% block content %}
-<<<<<<< HEAD
-<div class="row">
-	<div class="col-12">
-        <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
-        {% if records %}
-        <ul class="list-unstyled">
-            {% for record in records %}
-            <li class="p-1">
-                <a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title }}</a>
-                <form class="form-inline formtypelist">
-                  <div class="form-group">
-                    <label for="selectListType">Wybierz typ widoczności listy:</label>
-                    <select class="form-control mx-2" id="selectListType">
-                      <option>Publiczna</option>
-                      <option>Prywatna</option>
-                      <option>Tylko dla znajomych</option>
-                    </select>
-                  </div>
-                    <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
-                </form>
-            </li>
-            {% endfor %}
-        </ul>
-=======
 
 {% if session['username'] %}
 <!-- Przycisk uruchamiający modal dla DODAJ -->
@@ -51,7 +27,6 @@
               <button type="submit" class="btn btn-default" name="formularz" value="1">Dodaj album</button>
           </div>
       </form>
->>>>>>> a1bf0762f4524906276ff59bddb68cd00ec34fd5
     </div>
   </div>
 </div>
@@ -69,6 +44,16 @@
                 <td>
                 <li class="p-1">
                     <a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title }}</a>
+                    <form class="form-inline formtypelist">
+                      <div class="form-group">
+                        <select class="form-control mx-2" id="selectListType">                                              <option selected>Wybierz typ widoczności listy:</option>
+                          <option value="0">Publiczna</option>
+                          <option value="1">Prywatna</option>
+                          <option value="2">Tylko dla znajomych</option>
+                        </select>
+                      </div>
+                        <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
+                    </form>
                 </li>
                 </td>
                 {% if session['username'] %}

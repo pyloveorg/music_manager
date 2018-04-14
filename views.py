@@ -154,6 +154,10 @@ def get_record(id):
     return render_template('record.html', record=record, api_data=api_data)
 
 
+@app.route('/type-list', methods=['POST'])
+def save_lit_type():
+    pass
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
