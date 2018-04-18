@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{% set page_id = 'Edycja profilu' %}
+
+{% block title %}Edycja {{ current_user.username }}{% endblock %}
+
+{% block content %}
+    <h1>Edycja Profilu</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            Login<br>
+            {{ form.username(size=32) }}<br>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            Coś o sobie:<br>
+            {{ form.about_me(cols=50, rows=4) }}<br>
+            {% for error in form.about_me.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <button class="btn waves-effect waves-light custom-green" type="submit" name="action" value="login">Potwierdź</button>
+    </form>
+{% endblock %}
