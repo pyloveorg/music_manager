@@ -5,10 +5,12 @@
 
 {% block content %}
     <table>
+      <hr>
         <tr valign="top">
-            <td><img src="{{ user.avatar(128) }}"></td>
+            <td><img src="{{ user.avatar(200) }}"></td>
             <td>
-                <h1>Użytkownik: {{ user.username }}</h1>
+                <h1>{{ user.username }}</h1>
+                <p><a href="{{ url_for('followers_list', username=user.username) }}">Obserwowany: <b>{{ user.followers.count() }}         </b></a>         <a href="{{ url_for('followed_list', username=user.username) }}">Obserwuje: <b>{{ user.followed.count() }}</b></a></p>
                 {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
                 {% if user.register_in %}<p>Zarejestrowany od : {{ user.register_in }}</p>{% endif %}
                 {% if user.last_seen %}<p>Ostatnio online : {{ user.last_seen }}</p>{% endif %}
@@ -25,7 +27,7 @@
     <hr>
     {% for post in posts %}
     <p>
-    {{ post.author.username }} wrzucił: <b>{{ post.body }}</b>
+    <img src="{{ user.avatar(36) }}">{{ post.author.username }} wrzucił: <b>{{ post.body }}</b>
     </p>
     {% endfor %}
 {% endblock %}
