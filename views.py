@@ -299,3 +299,27 @@ def unfollow(username):
     db.session.commit()
     flash('Przestałeś obserwować {}.'.format(username))
     return redirect(url_for('user', username=username))
+
+
+@app.route('/followed_list/<username>')
+@login_required
+def followed_list(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Użytkownik {} nie znaleziony.'.format(username))
+        return redirect(url_for('index'))
+    followed_group = user.followed.all()
+    return render_template('followed_list.html', user=user,
+                           followed_group=followed_group)
+
+
+@app.route('/followers_list/<username>')
+@login_required
+def followers_list(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Użytkownik {} nie znaleziony.'.format(username))
+        return redirect(url_for('index'))
+    followers_group = user.followers.all()
+    return render_template('followers_list.html', user=user,
+                           followers_group=followers_group)
