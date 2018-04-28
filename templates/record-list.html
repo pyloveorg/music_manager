@@ -5,7 +5,7 @@
 
 {% if session['username'] %}
 <!-- Przycisk uruchamiający modal dla DODAJ -->
-<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+<button class="btn btn-primary btn-lg mt-3" data-toggle="modal" data-target="#myModal">
   Dodaj album
 </button>
 
@@ -33,11 +33,22 @@
 {% endif  %}
 <div class="row">
  {{ error }}
-    <table >
-        <div class="col-12">
-            <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
+    <div class="col-12">
+        <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
+        {% if records %}
+        {% if list_type %}
+         <h5>Twoja lista jest <span class="text-info font-weight-bold">{{ list_type }}</span></h5>
+        {% endif %}
+        <form action="/type-list" method="post" class="form-inline formtypelist">
+            <select class="form-control" id="selectListType" name="list-type">                                     <option selected disabled>Zmień typ widoczności listy:</option>
+              <option value="publiczna">Publiczna</option>
+              <option value="prywatna">Prywatna</option>
+              <option value="dla znajomych">Tylko dla znajomych</option>
+            </select>
+          <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
+        </form>
 
-            {% if records %}
+        <table>
             <ul class="list-unstyled">
                 {% for record in records %}
                 <tr>
@@ -49,9 +60,9 @@
                 {% if session['username'] %}
                 <td >
                     <!-- Przycisk uruchamiający modal dla EDYTUJ -->
-                          <button data-toggle="modal" data-target="#myModal2{{record.id}}">
-                              Edytuj
-                          </button>
+                  <button data-toggle="modal" data-target="#myModal2{{record.id}}">
+                      Edytuj
+                  </button>
 
                     <!-- Modal -->
                     <div class="modal fade" id="myModal2{{record.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -85,8 +96,8 @@
                 </tr>
                 {% endfor %}
             </ul>
-        </div>
-    </table>
+        </table>
+    </div>
 </div>
 {% endif %}
 {% endblock %}
