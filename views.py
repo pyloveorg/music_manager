@@ -104,10 +104,11 @@ def register():
 @app.route('/records/', methods=['GET'])
 def get_records():
     records = Record.query.all()
+    #sprawdza typ listy
     u_name = session['username']
     u = db.session.query(User.id).filter(User.username == u_name).scalar()
-    check_list_type = db.session.query(List.type).filter(List.user_id == u).scalar()
-    return render_template('record-list.html', records=records, list_type=check_list_type)
+    list_type = db.session.query(List.title).filter(List.user_id == u).scalar()
+    return render_template('record-list.html', records=records, list_type=list_type)
 
 
 @app.route('/records/', methods=['POST'])
@@ -180,19 +181,20 @@ def save_list_type():
         u_name = session['username']
         u = db.session.query(User.id).filter(User.username == u_name).scalar()
         list_type_select = request.form['list-type']
-        if list_type_select == 'public':
+        if list_type_select == 'publiczna':
             type = 0
-            title = 'public'
+            title = 'publiczna'
             flash('Twoja lista jest publiczna')
-        elif list_type_select == 'private':
+        elif list_type_select == 'prywatna':
             type = 1
-            title = 'private'
+            title = 'prywatna'
             flash('Twoja lista jest prywatna')
-        elif list_type_select == 'for_friends':
+        elif list_type_select == 'dla znajomych':
             type = 2
-            title = 'for_friends'
-            flash('Twoja lista jest widoczna tylko dla przyjaciół')
+            title = 'dla znajomych'
+            flash('Twoja lista jest widoczna tylko dla znajomych')
 
+        #sprawdzanie czy typ listy jest już określony
         check_list_type = db.session.query(List).filter(List.user_id == u).scalar()
         check_list_title = db.session.query(List).filter(List.user_id == u).scalar()
         if check_list_type and check_list_title:
@@ -204,10 +206,8 @@ def save_list_type():
             db.session.add(tplist)
             db.session.commit()
         return redirect('/records')
-        #poprawa kodu wyżej
-        #zmiena typu listy musi się nadpisywać, a nie dodawać jako nowy rekord - OK
-        #wyświetlić/stworzyć powiadomienie o wybranym typie listy
-        #obsługa widoczności listy w zależności od typu w templatkach
+
+        #obsługa widoczności listy w zależności od typu w templatkach - do zrobienia
 
 
 @app.errorhandler(404)
@@ -329,3 +329,27 @@ def unfollow(username):
     db.session.commit()
     flash('Przestałeś obserwować {}.'.format(username))
     return redirect(url_for('user', username=username))
+
+
+@app.route('/followed_list/<username>')
+@login_required
+def followed_list(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Użytkownik {} nie znaleziony.'.format(username))
+        return redirect(url_for('index'))
+    followed_group = user.followed.all()
+    return render_template('followed_list.html', user=user,
+                           followed_group=followed_group)
+
+
+@app.route('/followers_list/<username>')
+@login_required
+def followers_list(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Użytkownik {} nie znaleziony.'.format(username))
+        return redirect(url_for('index'))
+    followers_group = user.followers.all()
+    return render_template('followers_list.html', user=user,
+                           followers_group=followers_group)

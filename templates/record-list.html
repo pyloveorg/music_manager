@@ -36,13 +36,15 @@
     <div class="col-12">
         <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
         {% if records %}
-        <!-- selecty muszą być widoczne jak użytkownik jest zalogowany...pobierać listę użytkownika? -->
-        <form action="/type-list" method="post" class="form-inline formtypelist">                               <label for="selectListType">Typ widoczności listy:</label>
-          <select class="form-control mx-2" id="selectListType" name="list-type">                                   <option disabled>---</option>
-              <option value="public">Publiczna</option>
-              <option value="private">Prywatna</option>
-              <option value="for_friends">Tylko dla znajomych</option>
-          </select>
+        {% if list_type %}
+         <h5>Twoja lista jest <span class="text-info font-weight-bold">{{ list_type }}</span></h5>
+        {% endif %}
+        <form action="/type-list" method="post" class="form-inline formtypelist">
+            <select class="form-control" id="selectListType" name="list-type">                                     <option selected disabled>Zmień typ widoczności listy:</option>
+              <option value="publiczna">Publiczna</option>
+              <option value="prywatna">Prywatna</option>
+              <option value="dla znajomych">Tylko dla znajomych</option>
+            </select>
           <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
         </form>
 
