@@ -2,7 +2,7 @@
 
 from flask import url_for, render_template, request, redirect, session, flash
 from main import app, db, bcrypt, lm
-from models import User, Record, Review, Rating, EditProfileForm # KZ
+from models import User, Record, Review, Rating, EditProfileForm, List # KZ
 from sqlalchemy import func
 from flask_login import current_user, login_required, login_user, logout_user
 from datetime import datetime
@@ -104,7 +104,10 @@ def register():
 @app.route('/records/', methods=['GET'])
 def get_records():
     records = Record.query.all()
-    return render_template('record-list.html', records=records)
+    u_name = session['username']
+    u = db.session.query(User.id).filter(User.username == u_name).scalar()
+    check_list_type = db.session.query(List.type).filter(List.user_id == u).scalar()
+    return render_template('record-list.html', records=records, list_type=check_list_type)
 
 
 @app.route('/records/', methods=['POST'])
@@ -153,15 +156,10 @@ def get_record(id):
         flash('Nie odnaleziono albumu: {}'.format(id), category='danger')
         return redirect('/records')
     api_data = record.get_additional()
-
     reviews = db.session.query(Review).filter(Review.record_id == id)
-
     rating_avg = db.session.query(func.avg(Rating.rate)).filter(Rating.record_id == id).scalar()
-
     rating_count = db.session.query(Rating.rate).filter(Rating.record_id == id).count()
-
     u = db.session.query(User).all()
-
     rats = db.session.query(Rating).filter(Rating.record_id == id)
     # k
 
@@ -175,8 +173,42 @@ def get_record(id):
 
 
 @app.route('/type-list', methods=['POST'])
-def save_lit_type():
-    pass
+def save_list_type():
+    if request.method == 'POST':
+        type = None
+        title = ''
+        u_name = session['username']
+        u = db.session.query(User.id).filter(User.username == u_name).scalar()
+        list_type_select = request.form['list-type']
+        if list_type_select == 'public':
+            type = 0
+            title = 'public'
+            flash('Twoja lista jest publiczna')
+        elif list_type_select == 'private':
+            type = 1
+            title = 'private'
+            flash('Twoja lista jest prywatna')
+        elif list_type_select == 'for_friends':
+            type = 2
+            title = 'for_friends'
+            flash('Twoja lista jest widoczna tylko dla przyjaciół')
+
+        check_list_type = db.session.query(List).filter(List.user_id == u).scalar()
+        check_list_title = db.session.query(List).filter(List.user_id == u).scalar()
+        if check_list_type and check_list_title:
+            check_list_type.type = type
+            check_list_title.title = title
+            db.session.commit()
+        else:
+            tplist = List(title=title, type=type, user_id=u)
+            db.session.add(tplist)
+            db.session.commit()
+        return redirect('/records')
+        #poprawa kodu wyżej
+        #zmiena typu listy musi się nadpisywać, a nie dodawać jako nowy rekord - OK
+        #wyświetlić/stworzyć powiadomienie o wybranym typie listy
+        #obsługa widoczności listy w zależności od typu w templatkach
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -222,15 +254,10 @@ def get_reviews(id):
     reviews = db.session.query(Review).filter(Review.record_id == id)
 
     # score_sum = db.session.query(func.sum(Rating.rate).label('sum')).filter(Rating.record_id == id).scalar()
-
     rating_avg = db.session.query(func.avg(Rating.rate)).filter(Rating.record_id == id).scalar()
-
     rating_count = db.session.query(Rating.rate).filter(Rating.record_id == id).count()
-
     u = db.session.query(User).all()
-
     rats = db.session.query(Rating).filter(Rating.record_id == id)
-
     return render_template('reviews.html', reviews=reviews, avg_rat=rating_avg, rat_count=rating_count, users=u,
                            rats=rats)
 
