@@ -3,7 +3,6 @@
 __author__ = 'Piotr Dyba'
 
 from os import path
-
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -20,6 +19,7 @@ db.init_app(app)
 lm = LoginManager()
 lm.init_app(app)
 bcrypt = Bcrypt()
+lm.login_view = 'login'
 
 app.static_path = path.join(path.abspath(__file__), 'static')
 

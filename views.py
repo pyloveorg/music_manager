@@ -1,9 +1,11 @@
 """music_manager project"""
 
 from flask import url_for, render_template, request, redirect, session, flash
-from main import app, db, bcrypt
-from models import User, Record, Review, Rating  # KZ
+from main import app, db, bcrypt, lm
+from models import User, Record, Review, Rating, EditProfileForm # KZ
 from sqlalchemy import func
+from flask_login import current_user, login_required, login_user, logout_user
+from datetime import datetime
 
 app.secret_key = 'some_secret'
 
@@ -42,6 +44,7 @@ def login():
             return render_template('login.html', error=error)
 
         session['username'] = username_form
+        login_user(szukany_uzytkownik)
         return redirect('/profile')
     return render_template('login.html')
 
@@ -50,12 +53,13 @@ def login():
 def profile():
     if 'username' not in session:
         return redirect(url_for('login'))
-    return render_template('profile.html', tekst="Dziala! Zalogowalo sie AAAA")
+    return render_template('profile.html', tekst="witamy ")
 
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    logout_user()
     return redirect(url_for('info'))
 
 
@@ -230,5 +234,71 @@ def get_reviews(id):
     return render_template('reviews.html', reviews=reviews, avg_rat=rating_avg, rat_count=rating_count, users=u,
                            rats=rats)
 
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = [
+        {'author': user, 'body': 'Test post '}
+    ]
+    return render_template('user.html', user=user, posts=posts)
 
 
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now()
+        db.session.commit()
+
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(current_user.username)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.about_me.data = current_user.about_me
+    return render_template('edit_profile.html', title='Edit Profile',
+                           form=form)
+
+
+@app.route('/follow/<username>')
+@login_required
+def follow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Użytkownik {} nie znaleziony.'.format(username))
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash('Nie możesz sam siebie obserwować!')
+        return redirect(url_for('user', username=username))
+    current_user.follow(user)
+    db.session.commit()
+    flash('Zacząłeś obserwować {}!'.format(username))
+    return redirect(url_for('user', username=username))
+
+
+@app.route('/unfollow/<username>')
+@login_required
+def unfollow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Użytkownik {} nie znaleziony.'.format(username))
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash('Nie możesz sam siebie obserwować!')
+        return redirect(url_for('user', username=username))
+    current_user.unfollow(user)
+    db.session.commit()
+    flash('Przestałeś obserwować {}.'.format(username))
+    return redirect(url_for('user', username=username))
