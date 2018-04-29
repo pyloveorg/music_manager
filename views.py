@@ -105,10 +105,16 @@ def register():
 def get_records():
     records = Record.query.all()
     #sprawdza typ listy
-    u_name = session['username']
-    u = db.session.query(User.id).filter(User.username == u_name).scalar()
-    list_type = db.session.query(List.title).filter(List.user_id == u).scalar()
-    return render_template('record-list.html', records=records, list_type=list_type)
+    #list_type = None
+    #if current_user.is_authenticated:
+        #u_name = session['username']
+        #u = db.session.query(User.id).filter(User.username == session['username']).scalar()
+        #list_type = db.session.query(List.title).filter(List.user_id == u).scalar()
+    return render_template('record-list.html', records=records)
+    #else:
+        #tutaj trzeba dodać opcję w przypadku typu listy publicznej dla niezalogowanych
+        #return render_template('record-list.html', records=records)
+
 
 
 @app.route('/records/', methods=['POST'])
