@@ -1,0 +1,35 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+    <!--<meta charset="UTF-8">-->
+    <!--<title>Title</title>-->
+
+<!--</head>-->
+{% extends "_base.html" %}
+{% set page_id = 'reviews' %}
+{% block content %}
+<!--<body>-->
+{% if reviews %}
+    <p>Liczba komentarzy:  {{ reviews.count() }}</p>
+    <p>Średnia ocena: {{ avg_rat }}</p>
+    <p>Liczba ocen:  {{ rat_count }} </p>
+    {% for review in reviews %}
+
+Autor:{% for user in users %}
+{% if user.id == review.user_id %}
+{{ user.username }}
+{% endif %}
+{% endfor %}
+<br />
+Ocena: {{ rats.rate }}
+<br />
+Treść:
+
+
+     <p>{{ review.review }}</p>
+    {% endfor %}
+{% endif %}
+
+{% endblock %}
+<!--</body>-->
+<!--</html>-->

@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+{% set page_id = 'Lista obserwowanych' %}
+
+{% block title %}Lista obserwowanych {{ user.username }}{% endblock %}
+
+{% block content %}
+    <h1>Obserwowani przez {{ user.username }}</h1>
+    <hr>
+    {% for followed in followed_group %}
+    <p>
+        <a href="{{ url_for('user', username=followed.username) }}"><img src="{{ followed.avatar(36) }}">{{ followed.username }}
+                {% if not current_user.is_following(followed) %}
+                <a href="{{ url_for('follow', username=followed.username) }}">Obserwuj</a>
+                {% else %}
+                <a href="{{ url_for('unfollow', username=followed.username) }}">Przestań obserwować</a>
+                {% endif %}
+            </b></a>
+    </p>
+    {% endfor %}
+
+{% endblock %}

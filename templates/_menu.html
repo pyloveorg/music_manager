@@ -21,6 +21,8 @@
             </li>
             {% endif %}
             {% if session['username'] %}
+              <li class="nav-item{% if page_id == 'user' %} active{% endif %}">
+                  <a class="nav-link" href="{{ url_for('user', username=session.username) }}">Twój Profil</a>
               <li class="nav-item{% if page_id == 'logout' %} active{% endif %}">
                   <a class="nav-link" href="/logout">Wyloguj</a>
               </li>
