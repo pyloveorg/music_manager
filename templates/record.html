@@ -61,7 +61,7 @@
     <tr><td>Autor:</td>
         <td>{% for user in users %}
             {% if user.id == review.user_id %}
-            {{ user.username }}
+            <a href="{{ url_for('user', username=user.username) }}">{{ user.username }}</a>
             {% endif %}
             {% endfor %}</td></tr>
     <tr><td>Treść:</td>

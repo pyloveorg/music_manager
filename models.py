@@ -48,7 +48,6 @@ class User(UserMixin, db.Model):
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
-
     def is_active(self):
         """
         Returns if user is active.
@@ -78,6 +77,12 @@ class User(UserMixin, db.Model):
         return self.followed.filter(
             followers.c.followed_id == user.id).count() > 0
 
+    def followed_review(self):
+        followed = Review.query.join(
+            followers, (followers.c.followed_id == Review.user_id)).filter(
+                followers.c.follower_id == self.id)
+        own = Review.query.filter_by(user_id=self.id)
+        return followed.union(own).order_by(Review.timestamp.desc())
 
 
 record_list = db.Table('record_list', db.metadata,
@@ -184,6 +189,7 @@ class Review(db.Model):
     user_id = Column(Integer, db.ForeignKey('user.id'), nullable=False)
     record_id = Column(Integer, db.ForeignKey('record.id'), nullable=False)
     ratings = db.relationship('Rating', backref='review')
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     # def save_review(self, review, rec_id, usr_id):
     #     r = Review()
