@@ -267,14 +267,13 @@ def get_reviews(id):
     return render_template('reviews.html', reviews=reviews, avg_rat=rating_avg, rat_count=rating_count, users=u,
                            rats=rats)
 
+
 @app.route('/user/<username>')
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post '}
-    ]
-    return render_template('user.html', user=user, posts=posts)
+    reviews = current_user.followed_review().all()
+    return render_template("user.html", reviews=reviews, user=user)
 
 
 @lm.user_loader
