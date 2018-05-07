@@ -6,13 +6,8 @@
     </button>
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item{% if page_id == 'records' %} active{% endif %}">
-                <a class="nav-link" href="{{ url_for('get_records') }}">Albumy</a>
-            </li>
+
             {% if not session['username'] %}
-            <li class="nav-item{% if page_id == 'info' %} active{% endif %}">
-                <a class="nav-link" href="{{ url_for('info') }}">Info</a>
-            </li>
             <li class="nav-item{% if page_id == 'register' %} active{% endif %}">
                 <a class="nav-link" href="/register">Rejestracja</a>
             </li>
@@ -23,10 +18,14 @@
             {% if session['username'] %}
               <li class="nav-item{% if page_id == 'user' %} active{% endif %}">
                   <a class="nav-link" href="{{ url_for('user', username=session.username) }}">Twój Profil</a>
+              </li>
               <li class="nav-item{% if page_id == 'logout' %} active{% endif %}">
                   <a class="nav-link" href="/logout">Wyloguj</a>
               </li>
             {% endif %}
+            <li class="nav-item{% if page_id == 'records' %} active{% endif %}">
+                <a class="nav-link" href="{{ url_for('get_records') }}">Albumy</a>
+            </li>
         </ul>
     </div>
     {% if session['username'] %}
