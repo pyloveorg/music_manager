@@ -105,10 +105,16 @@ def register():
 def get_records():
     records = Record.query.all()
     #sprawdza typ listy
-    u_name = session['username']
-    u = db.session.query(User.id).filter(User.username == u_name).scalar()
-    list_type = db.session.query(List.title).filter(List.user_id == u).scalar()
-    return render_template('record-list.html', records=records, list_type=list_type)
+    #list_type = None
+    #if current_user.is_authenticated:
+        #u_name = session['username']
+        #u = db.session.query(User.id).filter(User.username == session['username']).scalar()
+        #list_type = db.session.query(List.title).filter(List.user_id == u).scalar()
+    return render_template('record-list.html', records=records)
+    #else:
+        #tutaj trzeba dodać opcję w przypadku typu listy publicznej dla niezalogowanych
+        #return render_template('record-list.html', records=records)
+
 
 
 @app.route('/records/', methods=['POST'])
@@ -261,14 +267,13 @@ def get_reviews(id):
     return render_template('reviews.html', reviews=reviews, avg_rat=rating_avg, rat_count=rating_count, users=u,
                            rats=rats)
 
+
 @app.route('/user/<username>')
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post '}
-    ]
-    return render_template('user.html', user=user, posts=posts)
+    reviews = current_user.followed_review().all()
+    return render_template("user.html", reviews=reviews, user=user)
 
 
 @lm.user_loader
