@@ -19,7 +19,7 @@
         <form action="/rating/{{ record.id }}" method="post">
         <p>Oceń album</p>
 
-        <p>Wybierz ocenę::
+        <p>Wybierz ocenę:
             <select name="score">
             <option value="1">1</option>
             <option value="2">2</option>
@@ -32,11 +32,9 @@
             <option value="9">9</option>
             <option value="10">10</option>
         </select>
-        <!--<div class="rating">-->
-        <!--<span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>-->
-        <!--</div>-->
+
         <button name="send">Wyślij ocenę</button></p>
-            <!--<p>Username: {{ session['username'] }}</p>-->
+
         </form>
 
         <form action="/review/{{ record.id }}" method="post">
@@ -46,15 +44,11 @@
 
         </form>
     </div>
-    <!--<div>-->
-        <!--<form action="/reviews/{{ record.id }}" method="post">-->
-            <!--<button name="btnShowRev">Show revs and rating</button>-->
-        <!--</form>-->
-    <!--</div>-->
+
 {% include '_record-api-details.html' %}
 
 {% if reviews %}
-    <p>Liczba komentarzy:  {{ reviews.count() }}</p>
+    <p>Liczba recenzji:  {{ reviews.count() }}</p>
 
     {% for review in reviews %}
 <table>
@@ -70,11 +64,6 @@
     <tr><td> </td></tr>
 </table>
 
-    <!--<br />-->
-    <!--Treść:-->
-
-
-     <!--<p></p>-->
     {% endfor %}
 {% endif %}
 
