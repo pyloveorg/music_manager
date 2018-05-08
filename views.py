@@ -151,6 +151,16 @@ def edit_record():
 def delete_record():
     id_delete = request.form.get("id_delete")
     delete_record=Record.query.get(id_delete)
+
+    rating_list = delete_record.ratings
+    review_list = delete_record.reviews
+
+    for review in review_list:
+        db.session.delete(review)
+
+    for rating in rating_list:
+        db.session.delete(rating)
+
     db.session.delete(delete_record)
     db.session.commit()
     return redirect('/records/')
@@ -280,10 +290,8 @@ def get_reviews(id):
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post '}
-    ]
-    return render_template('user.html', user=user, posts=posts)
+    reviews = current_user.followed_review().all()
+    return render_template("user.html", reviews=reviews, user=user)
 
 
 @lm.user_loader
@@ -306,7 +314,7 @@ def edit_profile():
         current_user.about_me = form.about_me.data
         db.session.commit()
         flash('Your changes have been saved.')
-        return redirect(url_for('edit_profile'))
+        return redirect('user/' + current_user.username)
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me

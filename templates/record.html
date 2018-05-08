@@ -15,11 +15,13 @@
 <div>
         <p>Średnia ocena: {{ '%0.2f' % avg_rat | float }} / Liczba ocen:  {{ rat_count }}</p>
 </div>
+
+{% if session['username'] %}
 	<div>
         <form action="/rating/{{ record.id }}" method="post">
         <p>Oceń album</p>
 
-        <p>Wybierz ocenę:
+        <p>Wybierz ocenę::
             <select name="score">
             <option value="1">1</option>
             <option value="2">2</option>
@@ -32,9 +34,11 @@
             <option value="9">9</option>
             <option value="10">10</option>
         </select>
-
+        <!--<div class="rating">-->
+        <!--<span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>-->
+        <!--</div>-->
         <button name="send">Wyślij ocenę</button></p>
-
+            <!--<p>Username: {{ session['username'] }}</p>-->
         </form>
 
         <form action="/review/{{ record.id }}" method="post">
@@ -44,18 +48,24 @@
 
         </form>
     </div>
+    <!--<div>-->
+        <!--<form action="/reviews/{{ record.id }}" method="post">-->
+            <!--<button name="btnShowRev">Show revs and rating</button>-->
+        <!--</form>-->
+    <!--</div>-->
+{% endif %}
 
 {% include '_record-api-details.html' %}
 
 {% if reviews %}
-    <p>Liczba recenzji:  {{ reviews.count() }}</p>
+    <p>Liczba komentarzy:  {{ reviews.count() }}</p>
 
     {% for review in reviews %}
 <table>
     <tr><td>Autor:</td>
         <td>{% for user in users %}
             {% if user.id == review.user_id %}
-            {{ user.username }}
+            <a href="{{ url_for('user', username=user.username) }}">{{ user.username }}</a>
             {% endif %}
             {% endfor %}</td></tr>
     <tr><td>Treść:</td>
@@ -64,6 +74,11 @@
     <tr><td> </td></tr>
 </table>
 
+    <!--<br />-->
+    <!--Treść:-->
+
+
+     <!--<p></p>-->
     {% endfor %}
 {% endif %}
 
