@@ -2,85 +2,81 @@
 {% set page_id = 'record' %}
 {% block title %} {{ record.artist }} - {{ record.title }} {% endblock %}
 {% block content %}
-{% if record %}
+    {% if record %}
+        <div class="row">
+            <div class="col-12">
+                <h1 class="h2 mt-3 mb-3">
+                    {{ record.artist }} - {{ record.title }}
+                </h1>
+            </div>
+        </div>
 
-<div class="row">
-	<div class="col-12">
-		<h1 class="h2 mt-3 mb-3">
-			{{ record.artist }} - {{ record.title }}
-		</h1>
-	</div>
+        <div>
+            <p>Średnia ocena: {{ '%0.2f' % avg_rat | float }} / Liczba ocen:  {{ rat_count }}</p>
+        </div>
 
-</div>
-<div>
-        <p>Średnia ocena: {{ '%0.2f' % avg_rat | float }} / Liczba ocen:  {{ rat_count }}</p>
-</div>
+        {% if session['username'] %}
+            <div>
+                <form action="/rating/{{ record.id }}" method="post">
+                    <p>Oceń album</p>
+                    <p>Wybierz ocenę::
+                        <select name="score">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    <!--<div class="rating">-->
+                    <!--<span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>-->
+                    <!--</div>-->
+                    <button name="send">Wyślij ocenę</button></p>
+                        <!--<p>Username: {{ session['username'] }}</p>-->
+                </form>
 
-{% if session['username'] %}
-	<div>
-        <form action="/rating/{{ record.id }}" method="post">
-        <p>Oceń album</p>
+                <form action="/review/{{ record.id }}" method="post">
+                    <p>Napisz recenzję:</p>
+                    <textarea name="ratingTxt" rows="3" cols="50"></textarea>
+                    <p><button name="saveRev">Wyślij recenzję</button></p>
+                </form>
+            </div>
+            <!--<div>-->
+                <!--<form action="/reviews/{{ record.id }}" method="post">-->
+                    <!--<button name="btnShowRev">Show revs and rating</button>-->
+                <!--</form>-->
+            <!--</div>-->
+        {% endif %}
 
-        <p>Wybierz ocenę::
-            <select name="score">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-        </select>
-        <!--<div class="rating">-->
-        <!--<span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>-->
-        <!--</div>-->
-        <button name="send">Wyślij ocenę</button></p>
-            <!--<p>Username: {{ session['username'] }}</p>-->
-        </form>
-
-        <form action="/review/{{ record.id }}" method="post">
-            <p>Napisz recenzję:</p>
-            <textarea name="ratingTxt" rows="3" cols="50"></textarea>
-            <p><button name="saveRev">Wyślij recenzję</button></p>
-
-        </form>
-    </div>
-    <!--<div>-->
-        <!--<form action="/reviews/{{ record.id }}" method="post">-->
-            <!--<button name="btnShowRev">Show revs and rating</button>-->
-        <!--</form>-->
-    <!--</div>-->
-{% endif %}
-
-{% include '_record-api-details.html' %}
-
-{% if reviews %}
-    <p>Liczba komentarzy:  {{ reviews.count() }}</p>
-
-    {% for review in reviews %}
-<table>
-    <tr><td>Autor:</td>
-        <td>{% for user in users %}
-            {% if user.id == review.user_id %}
-            <a href="{{ url_for('user', username=user.username) }}">{{ user.username }}</a>
-            {% endif %}
-            {% endfor %}</td></tr>
-    <tr><td>Treść:</td>
-        <td>{{ review.review }}</td>
-    </tr>
-    <tr><td> </td></tr>
-</table>
-
-    <!--<br />-->
-    <!--Treść:-->
+        {% include '_record-api-details.html' %}
 
 
-     <!--<p></p>-->
-    {% endfor %}
-{% endif %}
+        {% if reviews %}
+            <p>Liczba komentarzy:  {{ reviews.count() }}</p>
 
-{% endif %}
+            {% for review in reviews %}
+                <table>
+                    <tr>
+                        <td>Autor:</td>
+                        <td>
+                            {% for user in users %}
+                                {% if user.id == review.user_id %}
+                                    <a href="{{ url_for('user', username=user.username) }}">{{ user.username }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Treść:</td>
+                        <td>{{ review.review }}</td>
+                    </tr>
+                </table>
+
+            {% endfor %}
+        {% endif %}
+    {% endif %}
 {% endblock %}
