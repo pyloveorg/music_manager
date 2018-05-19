@@ -4,6 +4,7 @@ from flask import url_for, render_template, request, redirect, session, flash
 from main import app, db, bcrypt, lm
 from models import User, Record, Review, Rating, EditProfileForm, List # KZ
 from sqlalchemy import func
+from sqlalchemy import or_
 from flask_login import current_user, login_required, login_user, logout_user
 from datetime import datetime
 
@@ -32,16 +33,16 @@ def login():
         try:
             szukany_uzytkownik = User.query.filter_by(username=username_form).first()
         except ServerError as err:
-            error = str(err)
-            return render_template('login.html', error=error)
+            flash(str(err), 'danger')
+            return render_template('login.html')
 
         if szukany_uzytkownik is None:
-            error = "Zły login lub hasło!"
-            return render_template('login.html', error=error)
+            flash("Zły login lub hasło!", 'danger')
+            return render_template('login.html')
 
         if not bcrypt.check_password_hash(szukany_uzytkownik.password, password_form):
-            error = "Zły login lub hasło!"
-            return render_template('login.html', error=error)
+            flash("Zły login lub hasło!", 'danger')
+            return render_template('login.html')
 
         session['username'] = username_form
         login_user(szukany_uzytkownik)
@@ -65,7 +66,6 @@ def logout():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    error_register = None
 
     if request.method == 'POST':
         new_username = request.form.get('username')
@@ -76,17 +76,17 @@ def register():
         try:
             sprawdzanie_uzytkownika_login = User.query.filter_by(username=new_username).first()
             if sprawdzanie_uzytkownika_login is not None:
-                error_register = "Podany login już istnieje"
-                return render_template('register.html', error_register=error_register)
+                flash("Podany login już istnieje", 'danger')
+                return render_template('register.html',username=new_username,email=new_email)
 
             sprawdzanie_uzytkownika_email = User.query.filter_by(email=new_email).first()
             if sprawdzanie_uzytkownika_email is not None:
-                error_register = "Podany przez Ciebie adres e-mail już istnieje"
-                return render_template('register.html', error_register=error_register)
+                flash("Podany przez Ciebie adres e-mail już istnieje", 'danger')
+                return render_template('register.html',username=new_username,email=new_email)
 
             if not bcrypt.check_password_hash(new_password, new_password_verify):
-                error_register = "Podane hasła się nie zgadzają!"
-                return render_template('register.html', error_register=error_register)
+                flash("Podane hasła się nie zgadzają!", 'danger')
+                return render_template('register.html',username=new_username,email=new_email)
 
             new_user = User(username=new_username, password=new_password, email=new_email)
             db.session.add(new_user)
@@ -94,9 +94,8 @@ def register():
             return redirect('/login')   #### czy tu RETURN ?
 
         except ServerError as err:
-            error_register = str(err)
-
-        return render_template('register.html', error_register=error_register)
+            flash(str(err), 'danger')
+            return render_template('register.html')
 
     return render_template('register.html')
 
@@ -123,24 +122,24 @@ def new_record():
     new_title = request.form.get('title')
     # sprawdzanie czy ktoś zostawił puste pole
     if new_artist == '' or new_title == '':
-        error = "Wypełnij pola!"
+        flash("Wypełnij pola!", 'danger')
         records = Record.query.all()
-        return render_template('record-list.html', error=error, records=records)
+        return render_template('record-list.html', records=records)
 
     new_record = Record(title=new_title, artist=new_artist)
     api_check = new_record.get_additional()
     # sprawdzanie czy dany artysta/płyta są w zewnętrznym API
-    if 'error' in api_check :
-        error = "Nie znaleziono takiej pozycji. Podaj prawidłowe dane!"
+    if 'error' in api_check:
+        flash("Nie znaleziono takiej pozycji. Podaj prawidłowe dane!", 'warning')
         records = Record.query.all()
-        return render_template('record-list.html', error=error, records=records)
+        return render_template('record-list.html', records=records)
 
     # sprawdzanie czy juz istnieje w naszej bazie
     record_check = Record.query.filter_by(title=new_title, artist=new_artist).first()
     if record_check is not None:
-        error = "Dana pozycja już istnieje w bazie"
+        flash("Dana pozycja już istnieje w bazie", 'warning')
         records = Record.query.all()
-        return render_template('record-list.html', error=error, records=records)
+        return render_template('record-list.html', records=records)
 
     db.session.add(new_record)
     db.session.commit()
@@ -390,3 +389,33 @@ def followers_list(username):
     followers_group = user.followers.all()
     return render_template('followers_list.html', user=user,
                            followers_group=followers_group)
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST':
+        new_search = request.form.get('search')
+
+        # sprawdzanie czy ktoś zostawił puste pole
+        if new_search == '':
+            flash("Wypełnij pola!", 'warning')
+            records = Record.query.all()
+            return render_template('record-list.html', records=records)
+
+        try:
+            search_artist = Record.query.filter(or_(Record.title.like("%" + new_search + "%"), Record.artist.like("%" + new_search + "%"))).all()
+            if search_artist is None or len(search_artist)<1:
+                flash("Nie ma w bazie takiego artysty bądź tytułu!", 'warning')
+                records = Record.query.all()
+                return render_template('record-list.html', records=records)
+            else:
+                return render_template('record-list.html', records=search_artist)
+
+        except ServerError as err:
+            error_register = str(err)
+            flash(str(err), 'warning')
+
+    return render_template('info.html')
+
+
+
