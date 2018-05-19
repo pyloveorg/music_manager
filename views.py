@@ -77,16 +77,16 @@ def register():
             sprawdzanie_uzytkownika_login = User.query.filter_by(username=new_username).first()
             if sprawdzanie_uzytkownika_login is not None:
                 error_register = "Podany login już istnieje"
-                return render_template('register.html', error_register=error_register)
+                return render_template('register.html', error_register=error_register,username=new_username,email=new_email)
 
             sprawdzanie_uzytkownika_email = User.query.filter_by(email=new_email).first()
             if sprawdzanie_uzytkownika_email is not None:
                 error_register = "Podany przez Ciebie adres e-mail już istnieje"
-                return render_template('register.html', error_register=error_register)
+                return render_template('register.html', error_register=error_register,username=new_username,email=new_email)
 
             if not bcrypt.check_password_hash(new_password, new_password_verify):
                 error_register = "Podane hasła się nie zgadzają!"
-                return render_template('register.html', error_register=error_register)
+                return render_template('register.html', error_register=error_register,username=new_username,email=new_email)
 
             new_user = User(username=new_username, password=new_password, email=new_email)
             db.session.add(new_user)
