@@ -82,7 +82,7 @@ class User(UserMixin, db.Model):
             followers, (followers.c.followed_id == Review.user_id)).filter(
                 followers.c.follower_id == self.id)
         own = Review.query.filter_by(user_id=self.id)
-        return followed.union(own).union().order_by(Review.timestamp.desc())
+        return followed.union(own).order_by(Review.timestamp.desc())
 
 
 record_list = db.Table('record_list', db.metadata,
