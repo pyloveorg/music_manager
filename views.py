@@ -100,6 +100,57 @@ def register():
     return render_template('register.html')
 
 
+
+@app.route('/edit_password', methods=['GET','POST'])
+def edit_password():
+    if request.method == 'POST':
+        old_password = request.form.get('old_password')
+        new_password = bcrypt.generate_password_hash(request.form.get('new_password')).decode('utf-8')
+        new_password_verify = request.form.get('new_password_verify')
+
+        try:
+            username=session['username']
+            sprawdzanie_uzytkownika_haslo = User.query.filter_by(username=username).first()
+
+            if not bcrypt.check_password_hash(sprawdzanie_uzytkownika_haslo.password, old_password):
+                flash("Podaleś błędne stare hasło!", 'danger')
+                return render_template('edit_password.html')
+
+            if not bcrypt.check_password_hash(new_password, new_password_verify):
+                flash("Podane hasła się nie zgadzają!", 'danger')
+                return render_template('edit_password.html')
+
+
+            sprawdzanie_uzytkownika_haslo.password = new_password
+            db.session.commit()
+            flash("Hasło zmienione", 'success')
+            return redirect('/login')
+
+        except ServerError as err:
+            flash(str(err), 'danger')
+            return render_template('edit_password.html')
+
+
+    return render_template('edit_password.html')
+
+'''
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(current_user.username)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect('user/' + current_user.username)
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.about_me.data = current_user.about_me
+    return render_template('edit_profile.html', title='Edit Profile',
+                           form=form)
+'''
+
 @app.route('/records/', methods=['GET'])
 def get_records():
     records = Record.query.all()
