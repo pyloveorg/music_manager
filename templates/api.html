@@ -1,0 +1,29 @@
+{% extends "_base.html" %}
+{% set page_id = 'profile' %}
+
+{% block title %}Witaj{% endblock %}
+
+{% block content %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Wykonawca</th>
+                <th>Album</th>
+                <th>Rok</th>
+                <th>Kraj</th>
+                <th>Gatunki</th>
+                <th>Style</th>
+            </tr>
+        </thead>
+        {% for row in rows %}
+            <tr>
+                  <td>{{ row.artist }}</td>
+                  <td>{{ row.title }}</td>
+                  <td>{{ row.year }}</td>
+                  <td>{{ row.country }}</td>
+                  <td>{{ row.genres }}</td>
+                  <td>{{ row.styles }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

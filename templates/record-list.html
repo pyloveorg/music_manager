@@ -52,16 +52,25 @@
                 </form>
             {% endif %}
 
-            <table>
-                <ul class="list-unstyled">
+            <table border="1" width="100%" align="center">
+                <thead>
+                    <th>Wykonawca</th>
+                    <th>Album</th>
+                    <th>Rok</th>
+                    <th>Kraj</th>
+                    <th>Gatunki</th>
+                    <th>Style</th>
+                    <th colspan="2">Akcja</th>
+                </thead>
                     {% for record in records %}
                         <tr>
-                            <td>
-                                <li class="p-1">
-                                    <a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title
-                                        }}</a>
-                                </li>
-                            </td>
+                            <td>{{ record.artist }}</td>
+                            <td><a href="{{ url_for('get_record', id=record.id) }}">{{ record.title }}</a></td>
+                            <td>{{ record.country }}</td>
+                            <td>{{ record.year }}</td>
+                            <td>{{ record.genres }}</td>
+                            <td>{{ record.styles }}</td>
+
                             {% if session['username'] %}
                             <td>
                                 <!-- Przycisk uruchamiający modal dla EDYTUJ -->

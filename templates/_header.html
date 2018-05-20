@@ -1,0 +1,47 @@
+<header class="navbar navbar-expand-md navbar-dark bg-dark">
+
+    <div class="container mr-auto col-md-3">
+        <a class="navbar-brand" href="/"><img src="{{ url_for('static',filename='img/logo_yellow.png')}}" height="60" width="120"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+                aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+
+    <div id="searchMain" class="container mr-auto col-md-6">
+        <form class="example col-md-10" action="/search" method="POST">
+            <input type="text" placeholder="Search.." name="search" >
+            <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+    </div>
+
+    {% if not session['username'] %}
+    <div class="container mr-auto" align="right">
+        <ul class="navbar-nav col-md-3" >
+             <li class="nav-item{% if page_id == 'login' %} active{% endif %}">
+                <a class="nav-link" href="/login">Logowanie</a>
+            </li>
+            <li class="nav-item{% if page_id == 'register' %} active{% endif %}">
+                <a class="nav-link" href="/register">Rejestracja</a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if session['username'] %}
+    <div class="dropdown col-md-3" align="right">
+          <a href="#" data-toggle="dropdown"><img src="https://www.gravatar.com/avatar/%7B%7D?d=identicon&s=200" height="30" width="30">  <!-- tymczasowo dowolny plik png -->
+              {{session.username}}
+          </a>
+          <ul class="dropdown-menu" role="menu">
+              <li><a class="nav-link" href="{{ url_for('user',username=session.username)}}">Twój profil</a></li>
+              <li><a class="nav-link" href="/edit_profile">Edytuj profil</a></li>
+              <li><a class="nav-link" href="/edit_password">Zmień hasło</a></li>
+              <li><a class="nav-link" href="/logout">Wyloguj</a></li>
+
+          </ul>
+    </div>
+    {% endif %}
+
+
+</header>
