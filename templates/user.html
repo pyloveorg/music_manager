@@ -32,10 +32,12 @@
     <hr>
     {% endfor %}
 
+    {% if user == current_user %}
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#userListModal">
       Dodaj własną listę albumów
     </button>
+    {% endif %}
 
     <!-- Modal -->
     <div class="modal fade" id="userListModal" tabindex="-1" role="dialog" aria-labelledby="userListModal" aria-hidden="true">
@@ -100,7 +102,7 @@
                       </thead>
                       <tbody>
                       {% for list in albumlist %}
-                            {% if list.type == 1 %}
+                            {% if list.type == 1 and user == current_user %}
                                 <tr>
                                   <td><a href="/user/{{ user.username }}/list/{{ list.id }}">{{ list.title }}</a></td>
                                 </tr>
