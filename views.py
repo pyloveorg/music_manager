@@ -7,6 +7,7 @@ from sqlalchemy import func
 from sqlalchemy import or_
 from flask_login import current_user, login_required, login_user, logout_user
 from datetime import datetime
+import requests
 
 app.secret_key = 'some_secret'
 
@@ -467,6 +468,54 @@ def search():
             flash(str(err), 'warning')
 
     return render_template('info.html')
+
+@app.route('/api', methods=['GET'])
+def get_api_data():
+
+    rows = []
+    for count in range(1, 50):
+        url = 'https://api.discogs.com/releases/' + str(count)
+        response = requests.get(url)
+        jsonText = response.json()
+        artists = jsonText.get('artists')
+        title = jsonText.get('title')
+        genres = jsonText.get('genres')
+        styles = jsonText.get('styles')
+        country = jsonText.get('country')
+        year = jsonText.get('year')
+
+        genresString = ''
+        if (genres is not None):
+            for genre in genres:
+                genresString += str(genre) + ';'
+
+        stylesString = ''
+        if (styles is not None):
+            for style in styles:
+                stylesString += str(style) + ';'
+
+        names = []
+        if (artists is not None):
+            for artist in artists:
+                artist_name = artist['name']
+                dane = {
+                    'artist':artist_name,
+                    'title':title,
+                    'genres':genresString,
+                    'styles':stylesString,
+                    'country':country,
+                    'year':year
+                }
+                rows.append(dane)
+
+                record_check = Record.query.filter_by(title=title, artist=artist_name).first()
+                if record_check is None:
+                    plyta = Record(title=title, artist=artist_name, country=country, year=year, styles=stylesString, genres=genresString)
+                    db.session.add(plyta)
+                    db.session.commit()
+
+
+    return render_template('api.html', rows=rows)
 
 
 
