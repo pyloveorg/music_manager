@@ -10,6 +10,10 @@ body {
     background: none;
 }
 
+.main-block {
+    min-height: 300px;
+}
+
 pre {
     white-space: pre-wrap;
 }
