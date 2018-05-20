@@ -369,10 +369,8 @@ def user_lists(username,id):
     get_list = List.query.get(id)
     #pobiera rekordy z tablicy record_list
     get_records = db.session.query(record_list).all()
-    print(get_records)
     #tworzy listę albumów z w obrębie listy o danym <int:id>
     record_ids = [record[0] for record in get_records if record[1] == id]
-    print(record_ids)
     records_to_display = []
     for record_id in record_ids:
         records_to_display.append(Record.query.get(record_id))
