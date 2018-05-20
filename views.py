@@ -17,7 +17,11 @@ class ServerError(Exception):
 
 @app.route('/', methods=['GET', 'POST'])
 def info():
-    return render_template('info.html')
+    if 'username' in session:
+        posts = current_user.followed_review().order_by(Review.timestamp.desc()).all()
+        return render_template("followed_rev.html", posts=posts)
+    else:
+        return render_template('info.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -304,7 +308,7 @@ def get_reviews(id):
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    reviews = current_user.followed_review().all()
+    reviews = Review.query.filter_by(user_id=user.id)
     return render_template("user.html", reviews=reviews, user=user)
 
 
@@ -317,6 +321,13 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now()
         db.session.commit()
+
+
+@app.route('/reviews/', methods=['GET'])
+@login_required
+def explore():
+    posts = Review.query.order_by(Review.timestamp.desc()).all()
+    return render_template("all_reviews.html", posts=posts)
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])

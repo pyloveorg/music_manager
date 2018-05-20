@@ -26,4 +26,4 @@ app.static_path = path.join(path.abspath(__file__), 'static')
 
 if __name__ == '__main__':
     from views import *
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)

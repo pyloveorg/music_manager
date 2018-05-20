@@ -5,7 +5,8 @@ html{
 
 
 body {
-    width: 80%;
+    font-family: 'Lato', sans-serif;
+    width: 20%;
     margin: auto;
     background: none;
 }
@@ -56,3 +57,33 @@ pre {
 .rating > input:checked ~ label:hover,
 .rating > label:hover ~ input:checked ~ label, /* lighten current selection */
 .rating > input:checked ~ label:hover ~ label { color: #FFED85;  }
+
+/* CSS for list followers */
+
+.fcointerner
+{
+    background-color:red;
+    width = 1000px;
+    align:center;
+}
+
+.favatar{
+    width = 100px;
+    align:center;
+    float:left;
+}
+
+.fusername
+{
+    background-color:black;
+    width = 800px;
+    text-align:left;
+    float:left;
+}
+
+.ffunc
+{
+    width = 100px;
+    text-align:center;
+    float:left;
+}

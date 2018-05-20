@@ -25,10 +25,11 @@
     </table>
     <hr>
     {% for review in reviews %}
-    
+
     <p>
-    <img src="{{ user.avatar(36) }}">{{ user.username }} recenzował <a href="{{ url_for('get_record', id=review.record.id) }}">{{ review.record.artist}}-{{ review.record.title}}</a>: <p><b>{{ review.review }}</b></p>
+    <img src="{{ review.user.avatar(36) }}">{{ review.user.username }} recenzował <a href="{{ url_for('get_record', id=review.record.id) }}">{{ review.record.artist}}-{{ review.record.title}}</a>: <p><b>{{ review.review }}</b></p>
     </p>
     <hr>
     {% endfor %}
+
 {% endblock %}
