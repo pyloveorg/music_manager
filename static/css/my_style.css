@@ -1,5 +1,13 @@
-body {
+html{
+    background: WhiteSmoke;
+    padding-top: 25px;
+}
 
+
+body {
+    width: 80%;
+    margin: auto;
+    background: none;
 }
 
 pre {

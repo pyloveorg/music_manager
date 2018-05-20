@@ -133,13 +133,27 @@ def save_album_list():
 def new_record():
     new_artist = request.form.get('artist')
     new_title = request.form.get('title')
-
+    # sprawdzanie czy ktoś zostawił puste pole
     if new_artist == '' or new_title == '':
         error = "Wypełnij pola!"
         records = Record.query.all()
         return render_template('record-list.html', error=error, records=records)
 
     new_record = Record(title=new_title, artist=new_artist)
+    api_check = new_record.get_additional()
+    # sprawdzanie czy dany artysta/płyta są w zewnętrznym API
+    if 'error' in api_check :
+        error = "Nie znaleziono takiej pozycji. Podaj prawidłowe dane!"
+        records = Record.query.all()
+        return render_template('record-list.html', error=error, records=records)
+
+    # sprawdzanie czy juz istnieje w naszej bazie
+    record_check = Record.query.filter_by(title=new_title, artist=new_artist).first()
+    if record_check is not None:
+        error = "Dana pozycja już istnieje w bazie"
+        records = Record.query.all()
+        return render_template('record-list.html', error=error, records=records)
+
     db.session.add(new_record)
     db.session.commit()
     return redirect('/records/')

@@ -42,6 +42,21 @@
         <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
         {% if records %}
 
+        {% if session['username'] %}
+            <!--{% if list_type %}
+             <h5>Twoja lista jest <span class="text-info font-weight-bold">{{ list_type }}</span></h5>
+            {% endif %}-->
+        <form action="/type-list" method="post" class="form-inline formtypelist">
+            <select class="form-control" id="selectListType" name="list-type">                                     <option selected disabled>Zmień typ widoczności listy:</option>
+              <option value="publiczna">Publiczna</option>
+              <option value="prywatna">Prywatna</option>
+              <option value="dla znajomych">Tylko dla znajomych</option>
+            </select>
+          <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
+        </form>
+
+        {% endif %}
+
         <table>
             <ul class="list-unstyled">
                 {% for record in records %}
