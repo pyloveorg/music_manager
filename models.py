@@ -99,6 +99,10 @@ class Record(db.Model):
     id = Column(Integer, autoincrement=True, primary_key=True)
     title = Column(String(200), nullable=False)
     artist = Column(String(200), nullable=False)
+    year = Column(String(4), nullable=True)
+    country = Column(String(100), nullable=True)
+    genres = Column(String(255), nullable=True)
+    styles = Column(String(255), nullable=True)
     ratings = db.relationship('Rating', backref='record')
     reviews = db.relationship('Review', backref='record')
 

@@ -10,6 +10,10 @@ body {
     background: none;
 }
 
+.main-block {
+    min-height: 300px;
+}
+
 pre {
     white-space: pre-wrap;
 }
@@ -49,3 +53,43 @@ pre {
 .rating > input:checked ~ label:hover,
 .rating > label:hover ~ input:checked ~ label, /* lighten current selection */
 .rating > input:checked ~ label:hover ~ label { color: #FFED85;  }
+
+
+* {
+  box-sizing: border-box;
+}
+
+/* Style the search field */
+form.example input[type=text] {
+  padding: 2px;
+  font-size: 17px;
+  border: none;
+  float: left;
+  width: 80%;
+  background: WhiteSmoke;
+}
+
+/* Style the submit button */
+form.example button {
+  float: left;
+  width: 20%;
+  padding: 2px;
+  background: WhiteSmoke;
+  color: #ffcc00;
+  font-size: 17px;
+  border: none;
+  border-left: none; /* Prevent double borders */
+  cursor: pointer;
+}
+
+form.example button:hover {
+  background: #ffcc00;
+  color: WhiteSmoke;
+}
+
+/* Clear floats */
+form.example::after {
+  content: "";
+  clear: both;
+  display: table;
+}
