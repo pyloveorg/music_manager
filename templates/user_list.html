@@ -1,0 +1,17 @@
+<!{% extends "_base.html" %}
+{% set page_id = 'User list' %}
+{% block title %}Lista - {{ get_list.title }}{% endblock %}
+{% block content %}
+
+<h2>Lista - <b>{{ get_list.title }}</b></h2>
+    <ul class="list-unstyled">
+        {% if records_to_display %}
+            {% for record in records_to_display %}
+                <li class="py-2"><a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title }}</a></li>
+            {% endfor %}
+        {% else %}
+            <h4 class="py-3">Brak albumów</h4>
+        {% endif %}
+    </ul>
+
+{% endblock %}

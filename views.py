@@ -2,11 +2,12 @@
 
 from flask import url_for, render_template, request, redirect, session, flash
 from main import app, db, bcrypt, lm
-from models import User, Record, Review, Rating, EditProfileForm, List # KZ
+from models import User, Record, Review, Rating, EditProfileForm, List, record_list # KZ
 from sqlalchemy import func
 from sqlalchemy import or_
 from flask_login import current_user, login_required, login_user, logout_user
 from datetime import datetime
+import requests
 
 app.secret_key = 'some_secret'
 
@@ -154,17 +155,29 @@ def edit_profile():
 @app.route('/records/', methods=['GET'])
 def get_records():
     records = Record.query.all()
-    #sprawdza typ listy
-    #list_type = None
-    #if current_user.is_authenticated:
-        #u_name = session['username']
-        #u = db.session.query(User.id).filter(User.username == session['username']).scalar()
-        #list_type = db.session.query(List.title).filter(List.user_id == u).scalar()
-    return render_template('record-list.html', records=records)
-    #else:
-        #tutaj trzeba dodać opcję w przypadku typu listy publicznej dla niezalogowanych
-        #return render_template('record-list.html', records=records)
+    #sprawdza listy albumów użytkownika
+    if current_user.is_authenticated:
+        u_name = session['username']
+        u = db.session.query(User.id).filter(User.username == u_name).scalar()
+        list_album = db.session.query(List).filter(List.user_id == u).all()
+        #check_id_list = db.session.query(record_list).all()
 
+        return render_template('record-list.html', records=records, list_album=list_album)
+    else:
+        return render_template('record-list.html', records=records)
+
+
+@app.route('/album-list', methods=['POST'])
+def save_album_list():
+    if current_user.is_authenticated:
+        list_id = request.form['album-list']
+        list_id_query = List.query.get(list_id)
+        record_id = request.form['record-id']
+        record_id_query = Record.query.get(record_id)
+
+        list_id_query.records.append(record_id_query)
+        db.session.commit()
+    return redirect('/records/')
 
 
 @app.route('/records/', methods=['POST'])
@@ -256,38 +269,26 @@ def get_record(id):
 @app.route('/type-list', methods=['POST'])
 def save_list_type():
     if request.method == 'POST':
-        type = None
-        title = ''
         u_name = session['username']
         u = db.session.query(User.id).filter(User.username == u_name).scalar()
-        list_type_select = request.form['list-type']
-        if list_type_select == 'publiczna':
-            type = 0
-            title = 'publiczna'
+        title = request.form['list-name']
+        type = request.form['list-type']
+        if type == '0':
             flash('Twoja lista jest publiczna')
-        elif list_type_select == 'prywatna':
-            type = 1
-            title = 'prywatna'
+        elif type == '1':
             flash('Twoja lista jest prywatna')
-        elif list_type_select == 'dla znajomych':
-            type = 2
-            title = 'dla znajomych'
+        elif type == '2':
             flash('Twoja lista jest widoczna tylko dla znajomych')
 
-        #sprawdzanie czy typ listy jest już określony
-        check_list_type = db.session.query(List).filter(List.user_id == u).scalar()
-        check_list_title = db.session.query(List).filter(List.user_id == u).scalar()
-        if check_list_type and check_list_title:
-            check_list_type.type = type
-            check_list_title.title = title
-            db.session.commit()
+        #sprawdzanie czy nazwa listy już istnieje
+        check_list_exist = db.session.query(List).filter(List.user_id == u, List.title == title, List.type == type).first()
+        if check_list_exist:
+            flash('Lista o tej nazwie i typie już istnieje!')
         else:
             tplist = List(title=title, type=type, user_id=u)
             db.session.add(tplist)
             db.session.commit()
-        return redirect('/records')
-
-        #obsługa widoczności listy w zależności od typu w templatkach - do zrobienia
+        return redirect(url_for('user', username=u_name))
 
 
 @app.errorhandler(404)
@@ -354,8 +355,27 @@ def get_reviews(id):
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
+    u = db.session.query(User.id).filter(User.username == username).scalar()
     reviews = current_user.followed_review().all()
-    return render_template("user.html", reviews=reviews, user=user)
+    albumlist = db.session.query(List).filter(List.user_id == u).all()
+    return render_template("user.html", reviews=reviews, user=user, albumlist=albumlist)
+
+
+@app.route('/user/<username>/list/<int:id>')
+def user_lists(username,id):
+    user = User.query.filter_by(username=username).first_or_404()
+    u = db.session.query(User.id).filter(User.username == username).scalar()
+    ###
+    get_list = List.query.get(id)
+    #pobiera rekordy z tablicy record_list
+    get_records = db.session.query(record_list).all()
+    #tworzy listę albumów z w obrębie listy o danym <int:id>
+    record_ids = [record[0] for record in get_records if record[1] == id]
+    records_to_display = []
+    for record_id in record_ids:
+        records_to_display.append(Record.query.get(record_id))
+
+    return render_template("user_list.html", get_list=get_list,records_to_display=records_to_display)
 
 
 @lm.user_loader
@@ -467,6 +487,54 @@ def search():
             flash(str(err), 'warning')
 
     return render_template('info.html')
+
+@app.route('/api', methods=['GET'])
+def get_api_data():
+
+    rows = []
+    for count in range(1, 50):
+        url = 'https://api.discogs.com/releases/' + str(count)
+        response = requests.get(url)
+        jsonText = response.json()
+        artists = jsonText.get('artists')
+        title = jsonText.get('title')
+        genres = jsonText.get('genres')
+        styles = jsonText.get('styles')
+        country = jsonText.get('country')
+        year = jsonText.get('year')
+
+        genresString = ''
+        if (genres is not None):
+            for genre in genres:
+                genresString += str(genre) + ';'
+
+        stylesString = ''
+        if (styles is not None):
+            for style in styles:
+                stylesString += str(style) + ';'
+
+        names = []
+        if (artists is not None):
+            for artist in artists:
+                artist_name = artist['name']
+                dane = {
+                    'artist':artist_name,
+                    'title':title,
+                    'genres':genresString,
+                    'styles':stylesString,
+                    'country':country,
+                    'year':year
+                }
+                rows.append(dane)
+
+                record_check = Record.query.filter_by(title=title, artist=artist_name).first()
+                if record_check is None:
+                    plyta = Record(title=title, artist=artist_name, country=country, year=year, styles=stylesString, genres=genresString)
+                    db.session.add(plyta)
+                    db.session.commit()
+
+
+    return render_template('api.html', rows=rows)
 
 
 
