@@ -1,8 +1,8 @@
-Flask
-Flask-Bcrypt
-Flask-Login
-Flask-RESTful
-Flask-SQLAlchemy
+flask
+flask-Bcrypt
+flask-Login
+flask-RESTful
+flask-SQLAlchemy
 Jinja2
 MarkupSafe
 SQLAlchemy
