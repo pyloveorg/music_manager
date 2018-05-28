@@ -5,48 +5,51 @@
         <title>{% block title %}Music manager{% endblock %}</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
             integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <link href="https://fonts.googleapis.com/css?family=Lato&amp;subset=latin-ext" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/my_style.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/my_style.css') }}" >
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     </head>
 
     <body>
 
-    {% if session['username'] %}
-        {% include '_menu_log.html' %}
-    {% endif %}
-    {% if not session['username'] %}
-        {% include '_menu_no_log.html' %}
-    {% endif %}
+        {% include '_header.html' %}
+        <br/>
+        {% if session['username'] %}
+            {% include '_menu_log.html' %}
+        {% endif %}
+        {% if not session['username'] %}
+            {% include '_menu_no_log.html' %}
+        {% endif %}
 
 
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
-	                {% if messages %}
-	                    {% for  category, message in messages %}
-	                    <div data-alert class="alert alert-{{ category }} alert-dismissible show">
-	                        {{ message|urlize(30) }}
-		                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-		                      <span aria-hidden="true">&times;</span>
-		                    </button>
-	                     </div>
-	                    {% endfor %}
-	                {% endif %}
-                {% endwith %}
+        <div class="container main-block">
+            <div class="row">
+                <div class="col-12">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+                        {% if messages %}
+                            {% for  category, message in messages %}
+                            <div data-alert class="alert alert-{{ category }} alert-dismissible show">
+                                {{ message|urlize(30) }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                             </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
             </div>
+
+            {% block content %}{% endblock %}
         </div>
 
-    {% block content %}{% endblock %}
-    </div>
 
+        {% include '_footer.html' %}
 
-    {% include '_footer.html' %}
-
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     </body>
 </html>

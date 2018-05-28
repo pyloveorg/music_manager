@@ -56,11 +56,17 @@ def db_start():
     record_3 = models.Record(title='Led Zeppelin', artist='Led Zeppelin')
     record_4 = models.Record(title='Ramones', artist='Ramones')
     record_5 = models.Record(title='American Idiot', artist='Green Day')
+    record_6 = models.Record(title='Noc', artist='Budka Suflera')
+    record_7 = models.Record(title='Bad', artist='Michael Jackson')
+    record_8 = models.Record(title='Thriller', artist='Michael Jackson')
     db.session.add(record_1)
     db.session.add(record_2)
     db.session.add(record_3)
     db.session.add(record_4)
     db.session.add(record_5)
+    db.session.add(record_6)
+    db.session.add(record_7)
+    db.session.add(record_8)
     db.session.commit()
 
 if __name__ == '__main__':

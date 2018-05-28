@@ -5,10 +5,13 @@ html{
 
 
 body {
-    font-family: 'Lato', sans-serif;
     width: 80%;
     margin: auto;
     background: none;
+}
+
+.main-block {
+    min-height: 300px;
 }
 
 pre {
@@ -16,13 +19,6 @@ pre {
 }
 
 /* lista albumów */
-.formtypelist {
-    display: -webkit-inline-box;
-    display: -moz-inline-box;
-    display: -ms-inline-flexbox;
-    display: -webkit-inline-flex;
-    display: inline-flex;
-}
 .rating {
   border: none;
   float: left;
@@ -58,32 +54,42 @@ pre {
 .rating > label:hover ~ input:checked ~ label, /* lighten current selection */
 .rating > input:checked ~ label:hover ~ label { color: #FFED85;  }
 
-/* CSS for list followers */
 
-.fcointerner
-{
-    background-color:red;
-    width = 1000px;
-    align:center;
+* {
+  box-sizing: border-box;
 }
 
-.favatar{
-    width = 100px;
-    align:center;
-    float:left;
+/* Style the search field */
+form.example input[type=text] {
+  padding: 2px;
+  font-size: 17px;
+  border: none;
+  float: left;
+  width: 80%;
+  background: WhiteSmoke;
 }
 
-.fusername
-{
-    background-color:black;
-    width = 800px;
-    text-align:left;
-    float:left;
+/* Style the submit button */
+form.example button {
+  float: left;
+  width: 20%;
+  padding: 2px;
+  background: WhiteSmoke;
+  color: #ffcc00;
+  font-size: 17px;
+  border: none;
+  border-left: none; /* Prevent double borders */
+  cursor: pointer;
 }
 
-.ffunc
-{
-    width = 100px;
-    text-align:center;
-    float:left;
+form.example button:hover {
+  background: #ffcc00;
+  color: WhiteSmoke;
+}
+
+/* Clear floats */
+form.example::after {
+  content: "";
+  clear: both;
+  display: table;
 }

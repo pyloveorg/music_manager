@@ -25,11 +25,112 @@
     </table>
     <hr>
     {% for review in reviews %}
-
     <p>
-    <img src="{{ review.user.avatar(36) }}">{{ review.user.username }} recenzował <a href="{{ url_for('get_record', id=review.record.id) }}">{{ review.record.artist}}-{{ review.record.title}}</a>: <p><b>{{ review.review }}</b></p>
+        <img src="{{ review.user.avatar(36) }}">{{ review.user.username }} recenzował <a href="{{ url_for('get_record', id=review.record.id) }}">{{ review.record.artist}}-{{ review.record.title}}</a>: <p><b>{{ review.review }}</b></p>
     </p>
     <hr>
     {% endfor %}
 
+    {% if user == current_user %}
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#userListModal">
+      Dodaj własną listę albumów
+    </button>
+    {% endif %}
+
+    <!-- Modal -->
+    <div class="modal fade" id="userListModal" tabindex="-1" role="dialog" aria-labelledby="userListModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Stwórz własną listę</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+             <form action="/type-list" method="post" class="formtypelist">
+                 <div class="form-group">
+                     <input type="text" name="list-name" class="form-control" id="listName" placeholder="Nazwa listy">
+                 </div>
+                 <div class="form-group">
+                    <select class="form-control" id="selectListType" name="list-type">                                     <option selected disabled>Typ widoczności listy:</option>
+                      <option value="0">Publiczna</option>
+                      <option value="1">Prywatna</option>
+                      <option value="2">Tylko dla znajomych</option>
+                    </select>
+                 </div>
+              <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="my-3">Moje listy:</h3>
+    {% if albumlist %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th scope="col">Publiczne:</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for list in albumlist %}
+                        {% if list.type == 0 %}
+                            <tr>
+                              <td><a href="/user/{{ user.username }}/list/{{ list.id }}">{{ list.title }}</a></td>
+                            </tr>
+                        {% endif %}
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+                <div class="col-md-4">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th scope="col">Prywatne:</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for list in albumlist %}
+                            {% if list.type == 1 and user == current_user %}
+                                <tr>
+                                  <td><a href="/user/{{ user.username }}/list/{{ list.id }}">{{ list.title }}</a></td>
+                                </tr>
+                            {% endif %}
+                          {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+                <div class="col-md-4">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th scope="col">Dla znajomych:</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for list in albumlist %}
+                            {% if list.type == 2 %}
+                                <tr>
+                                  <td><a href="/user/{{ user.username }}/list/{{ list.id }}">{{ list.title }}</a></td>
+                                </tr>
+                            {% endif %}
+                          {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+    <h4>Brak list albumów</h4>
+    {% endif %}
 {% endblock %}
