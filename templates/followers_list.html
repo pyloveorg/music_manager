@@ -1,21 +1,27 @@
 {% extends "_base.html" %}
-{% set page_id = 'Lista obserwowanych' %}
+{% set page_id = 'Lista obserwujacych' %}
 
-{% block title %}Lista obserwowanych {{ user.username }}{% endblock %}
+{% block title %}Lista obserwowujacych {{ user.username }}{% endblock %}
 
 {% block content %}
-    <h1>Obserwowani przez {{ user.username }}</h1>
-    <hr>
-    {% for followed in followers_group %}
-    <p>
-        <a href="{{ url_for('user', username=followed.username) }}"><img src="{{ followed.avatar(36) }}">{{ followed.username }} </b></a>
-            {% if not current_user.is_following(followed) %}
-                <a href="{{ url_for('follow', username=followed.username) }}">Obserwuj</a>
-                {% else %}
-                <a href="{{ url_for('unfollow', username=followed.username) }}">Przestań obserwować</a>
-                {% endif %}
-            </b></a>
-    </p>
-    {% endfor %}
+     <table width="1000" align="center"  >
+        <tr>
+            <td colspan="3" align="left"><h1>Obserwujacy {{ user.username }}</h1></td>
+        </tr>
+        {% for followed in followers_group %}
+        <tr >
+                <td width="100" align="center"><a href="{{ url_for('user', username=followed.username) }}"><img src="{{ followed.avatar(36) }}"></a></td>
+                <td width="600" align="left"><a href="{{ url_for('user', username=followed.username) }}">{{ followed.username }}</a></td>
+                <td width="300" align="center">
+                    {% if not current_user.is_following(followed) %}
+                        <a href="{{ url_for('follow', username=followed.username) }}">Obserwuj</a>
+                        {% else %}
+                        <a href="{{ url_for('unfollow', username=followed.username) }}">Przestań obserwować</a>
+                        {% endif %}
+                </td>
+
+        {% endfor %}
+        </tr>
+    </table>
 
 {% endblock %}
