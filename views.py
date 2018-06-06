@@ -546,3 +546,9 @@ def get_api_data():
 
 
     return render_template('api.html', rows=rows)
+
+
+
+@app.route('/regulations', methods=['GET'])
+def get_regulations():
+    return render_template('regulations.html')
