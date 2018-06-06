@@ -19,13 +19,17 @@ class ServerError(Exception):
 
 @app.route('/', methods=['GET', 'POST'])
 def info():
-    return render_template('info.html')
+    if 'username' in session:
+        posts = current_user.followed_review().order_by(Review.timestamp.desc()).all()
+        return render_template("followed_rev.html", posts=posts)
+    else:
+        return render_template('info.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if 'username' in session:
-        return redirect(url_for('profile'))
+        return redirect(url_for('info'))
 
     if request.method == 'POST':
         username_form = request.form.get('username')
@@ -47,7 +51,7 @@ def login():
 
         session['username'] = username_form
         login_user(szukany_uzytkownik)
-        return redirect('/profile')
+        return redirect(url_for('info'))
     return render_template('login.html')
 
 
@@ -56,6 +60,13 @@ def profile():
     if 'username' not in session:
         return redirect(url_for('login'))
     return render_template('profile.html', tekst="witamy ")
+
+
+@app.route('/reviews/', methods=['GET'])
+@login_required
+def explore():
+    posts = Review.query.order_by(Review.timestamp.desc()).all()
+    return render_template("all_reviews.html", posts=posts)
 
 
 @app.route('/logout')
@@ -356,7 +367,7 @@ def get_reviews(id):
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     u = db.session.query(User.id).filter(User.username == username).scalar()
-    reviews = current_user.followed_review().all()
+    reviews = Review.query.filter_by(user_id=user.id)
     albumlist = db.session.query(List).filter(List.user_id == u).all()
     return render_template("user.html", reviews=reviews, user=user, albumlist=albumlist)
 
@@ -538,3 +549,6 @@ def get_api_data():
 
 
 
+@app.route('/regulations', methods=['GET'])
+def get_regulations():
+    return render_template('regulations.html')
