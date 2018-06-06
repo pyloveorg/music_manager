@@ -3,113 +3,123 @@
 {% block title %} Lista albumów {% endblock %}
 {% block content %}
 
-{% if session['username'] %}
-<!-- Przycisk uruchamiający modal dla DODAJ -->
-<button class="btn btn-primary btn-lg mt-3" data-toggle="modal" data-target="#myModal">
-  Dodaj album
-</button>
+{% if (session['username'] and session['adminMode']) %}
 
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="myModalLabel">Dodaj album</h4>
-      </div>
-      <form action="/records/" method="post">
-          <div class="modal-body">
-              <div class="form-group">
-                  <input type="hidden" name="new_id_hidden" class="form-control">
-                  <label>Artysta: </label>
-                  <input type="text" name="artist" class="form-control mb-2" required>
-                  <label>Tytuł albumu: </label>
-                  <input type="text" name="title" class="form-control" required>
-              </div>
+    <!-- Przycisk uruchamiający modal dla DODAJ -->
+    <button class="btn btn-primary btn-lg mt-3" data-toggle="modal" data-target="#myModal">
+      Dodaj album
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+                <div class="modal-content">
+                      <div class="modal-header">
+                          <h4 class="modal-title" id="myModalLabel">Dodaj album</h4>
+                      </div>
+                      <form action="/records/" method="post">
+                          <div class="modal-body">
+                              <div class="form-group">
+                                  <input type="hidden" name="new_id_hidden" class="form-control">
+                                  <label>Artysta: </label>
+                                  <input type="text" name="artist" class="form-control mb-2" required>
+                                  <label>Tytuł albumu: </label>
+                                  <input type="text" name="title" class="form-control" required>
+                              </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                              <button type="submit" class="btn btn-primary" name="formularz" value="1">Dodaj album</button>
+                          </div>
+                      </form>
+                </div>
           </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
-              <button type="submit" class="btn btn-primary" name="formularz" value="1">Dodaj album</button>
-          </div>
-      </form>
     </div>
-  </div>
-</div>
 {% endif  %}
 
 <div class="row">
     {{ error }}
-    <div class="col-12">
+    <div class="col-12 table-responsive">
         <h1 class="h2 mt-3 mb-3"> Lista albumów ({{ records | count }})</h1>
         {% if records %}
 
-        <table>
-            <ul class="list-unstyled">
-                {% for record in records %}
+        <table class="table table-bordered table-condensed table-striped table-hover">
+            <thead>
                 <tr>
-                <td>
-                <li class="p-1">
-                    <a href="{{ url_for('get_record', id=record.id) }}">{{ record.artist }} - {{ record.title }}</a>
-                </li>
-                </td>
-                {% if session['username'] %}
-                <td >
-                    <!-- Przycisk uruchamiający modal dla EDYTUJ -->
-                  <button class="btn btn-default" data-toggle="modal" data-target="#myModal2{{record.id}}">
-                      Edytuj
-                  </button>
+                    <th >Wykonawca - Album</th>
+                    <th width="5%">Rok</th>
+                    <th width="10%">Kraj</th>
+                    <th width="20%">Gatunki</th>
+                    <th width="20%">Style</th>
+                </tr>
+            </thead>
+            {% for record in records %}
+                <tr class="table-row">
+                    <td><a href="{{ url_for('get_record', id=record.id) }}"> {{ record.artist }} - {{ record.title }}</a></td>
+                    <td>{{ record.year }}</td>
+                    <td>{{ record.country }}</td>
+                    <td>{{ record.genres }}</td>
+                    <td>{{ record.styles }}</td>
 
-                    <!-- Modal -->
-                    <div class="modal fade" id="myModal2{{record.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h4 class="modal-title" id="myModalLabel">Edytuj album</h4>
-                          </div>
-                          <form action="/records/edit" method="post">
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <input type="hidden" name="edit_id" value="{{record.id}}" class="form-control">
-                                    <label>Artysta: </label>
-                                    <input type="text" name="artist" required value="{{record.artist}}" class="form-control mb-2">
-                                    <label>Tytuł albumu: </label>
-                                    <input type="text" name="title" required value="{{record.title}}" class="form-control">
+                    {% if (session['username'] and session['adminMode']) %}
+                    <td >
+                        <!-- Przycisk uruchamiający modal dla EDYTUJ -->
+                        <button class="btn btn-default" data-toggle="modal" data-target="#myModal2{{record.id}}">
+                            Edytuj
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="myModal2{{record.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="myModalLabel">Edytuj album</h4>
+                                    </div>
+                                    <form action="/records/edit" method="post">
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <input type="hidden" name="edit_id" value="{{record.id}}" class="form-control">
+                                                <label>Artysta: </label>
+                                                <input type="text" name="artist" required value="{{record.artist}}" class="form-control mb-2">
+                                                <label>Tytuł albumu: </label>
+                                                <input type="text" name="title" required value="{{record.title}}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                                            <button type="submit" class="btn btn-primary" name="formularz">Edytuj album</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
-                                <button type="submit" class="btn btn-primary" name="formularz">Edytuj album</button>
-                            </div>
-                          </form>
                         </div>
-                      </div>
-                    </div>
-                </td>
-                <td >
-                    <form action="/delete_record" method="post">
-                        <input type="hidden" value="{{record.id}}" name="id_delete" />
-                        <button type="submit" class="btn btn-danger">Usuń</button>
-                    </form>
-                </td>
-                {% if list_album %}
-                <td>
-                    <form action="/album-list" method="post" class="form-inline formtypelist">
-                        <input type="hidden" name="record-id" value="{{ record.id }}">
-                        <select class="form-control" id="selectListType" name="album-list">
-                            <option disabled selected>Zapisz album do listy:</option>
-                            {% for list in list_album %}
-                                <option value="{{ list.id }}">Lista: {{ list.title }}</option>
-                            {% endfor %}
-                        </select>
-                      <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
-                    </form>
-                </td>
-                {% endif %}
-                {% endif %}
+                    </td>
+                    <td >
+                        <form action="/delete_record" method="post">
+                            <input type="hidden" value="{{record.id}}" name="id_delete" />
+                            <button type="submit" class="btn btn-danger">Usuń</button>
+                        </form>
+                    </td>
+                        {% if list_album %}
+                        <td>
+                            <form action="/album-list" method="post" class="form-inline formtypelist">
+                                <input type="hidden" name="record-id" value="{{ record.id }}">
+                                <select class="form-control" id="selectListType" name="album-list">
+                                    <option disabled selected>Zapisz album do listy:</option>
+                                    {% for list in list_album %}
+                                        <option value="{{ list.id }}">Lista: {{ list.title }}</option>
+                                    {% endfor %}
+                                </select>
+                              <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    {% endif %}
                 </tr>
-                {% endfor %}
-            </ul>
+            {% endfor %}
         </table>
     </div>
 </div>
 {% endif %}
 {% endblock %}
+
