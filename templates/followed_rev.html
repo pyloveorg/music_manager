@@ -1,0 +1,22 @@
+{% extends "_base.html" %}
+{% set page_id = 'Lista obserwowanych' %}
+
+
+
+{% block content %}
+    <table width="1000" align="center"  >
+        <tr>
+            <td colspan="3" align="left"><h1>Twoje recenzje (DODAJ LINKI DO NICH) i do jakiego albumu ta recenzja</h1></td>
+        </tr>
+        {% for post in posts %}
+
+        <tr>
+            <td> - </td>
+            <td>{{ post.review }}</td>
+            <td>{{ post.timestamp }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+{% endblock %}
