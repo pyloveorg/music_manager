@@ -11,8 +11,8 @@
                 <h1>{{ user.username }}</h1>
                 <p><a href="{{ url_for('followers_list', username=user.username) }}">Obserwowany: <b>{{ user.followers.count() }}         </b></a>         <a href="{{ url_for('followed_list', username=user.username) }}">Obserwuje: <b>{{ user.followed.count() }}</b></a></p>
                 {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-                {% if user.register_in %}<p>Zarejestrowany od : {{ user.register_in }}</p>{% endif %}
-                {% if user.last_seen %}<p>Ostatnio online : {{ user.last_seen }}</p>{% endif %}
+                {% if user.register_in %}<p>Zarejestrowany od : {{ user.register_in.strftime('%Y-%m-%d %H:%M') }}</p>{% endif %}
+                {% if user.last_seen %}<p>Ostatnio online : {{ user.last_seen.strftime('%Y-%m-%d %H:%M') }}</p>{% endif %}
                 {% if user == current_user %}
                 <p><a href="{{ url_for('edit_profile') }}">Edycja profilu</a></p>
                 {% elif not current_user.is_following(user) %}

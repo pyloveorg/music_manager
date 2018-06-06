@@ -93,3 +93,7 @@ form.example::after {
   clear: both;
   display: table;
 }
+
+.table-row{
+    cursor:pointer;
+}
