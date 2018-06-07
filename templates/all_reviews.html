@@ -5,10 +5,23 @@
 
 {% block content %}
 <br>
-{% for review in posts %}
-<p>
-<img src="{{ review.user.avatar(36) }}">{{ review.user.username }} recenzował <a href="{{ url_for('get_record', id=review.record.id) }}">{{ review.record.artist}}-{{ review.record.title}}</a>: <p><b>{{ review.review }}</b></p>
-</p>
-<hr>
-{% endfor %}
+    <h3>Recenzje wszystkich użytkoników</h3>
+<table class="table table-bordered table-condensed table-striped table-hover">
+        <thead>
+            <td width="10%">Nazwa użytkownika</td>
+            <td width="15%">Data dodania</td>
+            <td width="25%">Artysta - Płyta</td>
+            <td>Treść</td>
+        </thead>
+        {% for post in posts %}
+
+        <tr class="table-row">
+            <td><a href="{{ url_for('user', username=post.user.username) }}">{{ post.user.username }}</a></td>
+            <td>{{ post.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td><a href="{{ url_for('get_record', id=post.record_id) }}"> {{ post.record.artist }} - {{ post.record.title }}</a></td>
+            <td>{{ post.review }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
 {% endblock %}
