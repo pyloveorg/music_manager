@@ -17,23 +17,14 @@ class ServerError(Exception):
     pass
 
 
-@app.route('/myReviews', methods=['GET'])
-def myReviews():
-    posts = current_user.followed_review().order_by(Review.timestamp.desc()).all()
-    return render_template("followed_rev.html", posts=posts)
-
-
 @app.route('/', methods=['GET', 'POST'])
 def info():
     if 'username' in session:
-        user = current_user
-        u = db.session.query(User.id).filter(User.username == current_user.username).scalar()
-        reviews = Review.query.filter_by(user_id=user.id)
-        albumlist = db.session.query(List).filter(List.user_id == u).all()
-        return render_template("user.html", reviews=reviews, user=user, albumlist=albumlist)
-
+        posts = current_user.followed_review().order_by(Review.timestamp.desc()).all()
+        return render_template("followed_rev.html", posts=posts)
     else:
         return render_template('info.html')
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -405,7 +396,7 @@ def user(username):
     u = db.session.query(User.id).filter(User.username == username).scalar()
     reviews = Review.query.filter_by(user_id=user.id)
     albumlist = db.session.query(List).filter(List.user_id == u).all()
-    return render_template("user.html", reviews=reviews, user=user, albumlist=albumlist)
+    return render_template("user.html", posts=reviews, user=user, albumlist=albumlist)
 
 
 @app.route('/user/<username>/list/<int:id>')

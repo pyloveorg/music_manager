@@ -23,14 +23,23 @@
             </td>
         </tr>
     </table>
-    <hr>
-    {% for review in reviews %}
-    <p>
-        <img src="{{ user.avatar(36) }}">{{ user.username }} recenzował <a href="{{ url_for('get_record', id=review.record.id) }}">{{ review.record.artist}}-{{ review.record.title}}</a>:
-        <p><b>{{ review.review }}</b></p>
-    </p>
-    <hr>
-    {% endfor %}
+<h4>Recencje użytkownika: </h4>
+    <table class="table table-bordered table-condensed table-striped table-hover">
+        <thead>
+            <td width="15%">Data dodania</td>
+            <td width="25%">Artysta - Płyta</td>
+            <td>Treść</td>
+        </thead>
+        {% for post in posts %}
+
+        <tr class="table-row">
+            <td>{{ post.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td><a href="{{ url_for('get_record', id=post.record_id) }}"> {{ post.record.artist }} - {{ post.record.title }}</a></td>
+            <td>{{ post.review }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
 
     {% if user == current_user %}
     <!-- Button trigger modal -->
