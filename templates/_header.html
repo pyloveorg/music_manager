@@ -30,16 +30,28 @@
 
     {% if session['username'] %}
     <div class="dropdown col-md-3" align="right">
-          <a href="#" data-toggle="dropdown"><img src="https://www.gravatar.com/avatar/%7B%7D?d=identicon&s=200" height="30" width="30">  <!-- tymczasowo dowolny plik png -->
-              {{session.username}}
-          </a>
-          <ul class="dropdown-menu" role="menu">
-              <li><a class="nav-link" href="{{ url_for('user',username=session.username)}}">Twój profil</a></li>
-              <li><a class="nav-link" href="/edit_profile">Edytuj profil</a></li>
-              <li><a class="nav-link" href="/edit_password">Zmień hasło</a></li>
-              <li><a class="nav-link" href="/logout">Wyloguj</a></li>
+        <a href="#" data-toggle="dropdown"><img src="https://www.gravatar.com/avatar/%7B%7D?d=identicon&s=200" height="30" width="30">  <!-- tymczasowo dowolny plik png -->
+            {{session.username}}
+        </a>
 
-          </ul>
+        <ul class="dropdown-menu" role="menu">
+            <li><a class="nav-link" href="{{ url_for('user',username=session.username)}}">Twój profil</a></li>
+            <li><a class="nav-link" href="/edit_profile">Edytuj profil</a></li>
+            <li><a class="nav-link" href="/edit_password">Zmień hasło</a></li>
+
+
+            {% if session['admin'] %}
+                {% if session['adminMode'] %}
+                    <li><a class="nav-link" href="/adminOff">Wyłącz tryb Admina</a></li>
+                {% endif %}
+                {% if not session['adminMode'] %}
+                    <li><a class="nav-link" href="/adminOn">Tryb Admina</a></li>
+                {% endif %}
+            {% endif %}
+
+            <li><a class="nav-link" href="/logout">Wyloguj</a></li>
+
+</ul>
     </div>
     {% endif %}
 

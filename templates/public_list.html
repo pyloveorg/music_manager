@@ -1,0 +1,24 @@
+{% extends "_base.html" %}
+{% set page_id = 'publicLists' %}
+
+{% block title %}Listy publiczne{% endblock %}
+
+{% block content %}
+
+    <h1>Listy publiczne</h1>
+    <table width="1000" align="center"  >
+        <thead>
+            <tr>Nazwa listy</tr>
+            <tr>Twórca</tr>
+        </thead>
+
+        {% for list in publicLists %}
+            <tr >
+                <td><a href="/user/{{ list.user.username }}/list/{{ list.id }}">{{ list.title }}</a></td>
+                <td>{{ list.user.username }}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+{% endblock %}
