@@ -4,7 +4,6 @@
 {% block title %}Aktywnosc uzytkownikow{% endblock %}
 
 {% block content %}
-<br>
     <h3>Recenzje wszystkich użytkoników</h3>
 <table class="table table-bordered table-condensed table-striped table-hover">
         <thead>
@@ -24,4 +23,10 @@
         {% endfor %}
 
     </table>
+    {% if prev_url %}
+    <a href="{{ prev_url }}">Nowsze recenzje  </a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">Starsze recenzje </a>
+    {% endif %}
 {% endblock %}
