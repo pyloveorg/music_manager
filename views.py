@@ -609,13 +609,9 @@ def publicLists():
 
 @app.route('/top/', methods=['GET'])
 def top():
-
-    # albums = db.session.query(Record, func.count(Rating.id)).join(Rating).group_by(Record.id).all()
     albums = (db.session.query(Record.artist, Record.title, func.count(Rating.id).label('val')).join(Rating)
               .group_by(Record.id).order_by(desc('val')).all())
 
-    # for _r, _rev in albums.all():
-    #     print(_r.id, _r.artist, _r.title , _rev)
     print(albums)
     r_type = 'records'
     return render_template('top_list.html', albums=albums, type=r_type, val_desc='Liczba ocen')
@@ -624,13 +620,9 @@ def top():
 @app.route('/top/rats', methods=['GET'])
 def top_rats():
 
-    # albums = db.session.query(Record, func.count(Rating.id)).join(Rating).group_by(Record.id).all()
     albums = (db.session.query(Record.artist, Record.title, func.count(Rating.id).label('val')).join(Rating)
               .group_by(Record.id).order_by(desc('val')).all())
 
-    # for _r, _rev in albums.all():
-    #     print(_r.id, _r.artist, _r.title , _rev)
-    print(albums)
     r_type = 'records'
     return render_template('top_list.html', albums=albums, type=r_type, val_desc='Liczba ocen')
 
@@ -638,7 +630,6 @@ def top_rats():
 @app.route('/top/revs', methods=['GET'])
 def top_revs():
 
-    # albums = db.session.query(Record, func.count(Rating.id)).join(Rating).group_by(Record.id).all()
     albums = (db.session.query(Record.artist, Record.title, func.count(Review.id).label('val')).join(Review)
               .group_by(Record.id).order_by(desc('val')).all())
 
@@ -650,11 +641,9 @@ def top_revs():
 @app.route('/top/avg', methods=['GET'])
 def top_avg():
 
-    # albums = db.session.query(Record, func.count(Rating.id)).join(Rating).group_by(Record.id).all()
     albums = (db.session.query(Record.artist, Record.title, func.avg(Rating.rate).label('val')).join(Rating)
               .group_by(Record.id).order_by(desc('val')).all())
 
-    print(albums)
     r_type = 'records'
     return render_template('top_list.html', albums=albums, type=r_type, val_desc='Średnia ocena')
 
@@ -664,6 +653,6 @@ def top_users_rev():
     users = (db.session.query(User.username, func.count(Review.id).label('val')).join(Review)
              .group_by(User.id).order_by(desc('val')).all())
     r_type = 'users'
-    print(user)
+
     return render_template('top_list.html', albums=users, type=r_type, val_desc='Liczba recenzji')
 
