@@ -36,7 +36,7 @@
                 </thead>
             {% for album in albums %}
             <tr>
-                <td>{{ album.title }} </td>
+                <td><a href="{{ url_for('get_record', id=album.id) }}"> {{ album.title }} </a> </td>
                 <td>{{ album.artist }} </td>
                 <td>{{ album.val }} </td>
             </tr>
@@ -53,7 +53,7 @@
                 </thead>
             {% for album in albums %}
                 <tr>
-                    <td>{{ album.username }}</td>
+                    <td><a href="{{ url_for('user', username=album.username) }}"> {{ album.username }} </a></td>
                     <td>{{ album.val }}</td>
                 </tr>
             {% endfor %}
