@@ -609,7 +609,7 @@ def publicLists():
 
 @app.route('/top/', methods=['GET'])
 def top():
-    albums = (db.session.query(Record.artist, Record.title, func.count(Rating.id).label('val')).join(Rating)
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.count(Rating.id).label('val')).join(Rating)
               .group_by(Record.id).order_by(desc('val')).all())
 
     print(albums)
@@ -620,7 +620,7 @@ def top():
 @app.route('/top/rats', methods=['GET'])
 def top_rats():
 
-    albums = (db.session.query(Record.artist, Record.title, func.count(Rating.id).label('val')).join(Rating)
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.count(Rating.id).label('val')).join(Rating)
               .group_by(Record.id).order_by(desc('val')).all())
 
     r_type = 'records'
@@ -630,7 +630,7 @@ def top_rats():
 @app.route('/top/revs', methods=['GET'])
 def top_revs():
 
-    albums = (db.session.query(Record.artist, Record.title, func.count(Review.id).label('val')).join(Review)
+    albums = (db.session.query(Record.artist, Record.title,  Record.id, func.count(Review.id).label('val')).join(Review)
               .group_by(Record.id).order_by(desc('val')).all())
 
     print(albums)
@@ -641,7 +641,7 @@ def top_revs():
 @app.route('/top/avg', methods=['GET'])
 def top_avg():
 
-    albums = (db.session.query(Record.artist, Record.title, func.avg(Rating.rate).label('val')).join(Rating)
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.avg(Rating.rate).label('val')).join(Rating)
               .group_by(Record.id).order_by(desc('val')).all())
 
     r_type = 'records'
@@ -650,7 +650,7 @@ def top_avg():
 
 @app.route('/top/users-rev', methods=['GET'])
 def top_users_rev():
-    users = (db.session.query(User.username, func.count(Review.id).label('val')).join(Review)
+    users = (db.session.query(User.username, User.id, func.count(Review.id).label('val')).join(Review)
              .group_by(User.id).order_by(desc('val')).all())
     r_type = 'users'
 
