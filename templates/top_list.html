@@ -1,0 +1,66 @@
+{% extends "_base.html" %}
+{% block title %} Ranking {% endblock %}
+{% block content %}
+
+<table class="table table-bordered table-condensed table-striped table-hover">
+    <tr>
+        <td>
+            <a href="{{ url_for('top_revs') }}">Najwięcej recenzji</a>
+        </td>
+        <td>
+            <a href="{{ url_for('top_rats') }}">Najwięcej ocen</a>
+        </td>
+        <td>
+            <a href="{{ url_for('top_avg') }}">Najlepsza ocena</a>
+        </td>
+        <td>
+            <a href="{{ url_for('top_users_rev') }}">Najaktywniejszy użytkownik</a>
+        </td>
+    </tr>
+
+</table>
+
+
+
+<br>
+<div>
+    {% if albums %}
+        {% if type == "records" %}
+            <table class="table table-bordered table-condensed table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>Tytuł</th>
+                    <th>Wykonawca</th>
+                    <th>{{ val_desc }}</th>
+                </tr>
+                </thead>
+            {% for album in albums %}
+            <tr>
+                <td><a href="{{ url_for('get_record', id=album.id) }}"> {{ album.title }} </a> </td>
+                <td>{{ album.artist }} </td>
+                <td>{{ album.val }} </td>
+            </tr>
+            {% endfor %}
+            </table>
+        {% else %}
+            <table class="table table-bordered table-condensed table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>Użytkownik</th>
+
+                    <th>{{ val_desc }}</th>
+                </tr>
+                </thead>
+            {% for album in albums %}
+                <tr>
+                    <td><a href="{{ url_for('user', username=album.username) }}"> {{ album.username }} </a></td>
+                    <td>{{ album.val }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+            </table>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -5,6 +5,7 @@ from main import app, db, bcrypt, lm
 from models import User, Record, Review, Rating, EditProfileForm, List, record_list # KZ
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy import desc
 from flask_login import current_user, login_required, login_user, logout_user
 from datetime import datetime
 import requests
@@ -17,23 +18,14 @@ class ServerError(Exception):
     pass
 
 
-@app.route('/myReviews', methods=['GET'])
-def myReviews():
-    posts = current_user.followed_review().order_by(Review.timestamp.desc()).all()
-    return render_template("followed_rev.html", posts=posts)
-
-
 @app.route('/', methods=['GET', 'POST'])
 def info():
     if 'username' in session:
-        user = current_user
-        u = db.session.query(User.id).filter(User.username == current_user.username).scalar()
-        reviews = Review.query.filter_by(user_id=user.id)
-        albumlist = db.session.query(List).filter(List.user_id == u).all()
-        return render_template("user.html", reviews=reviews, user=user, albumlist=albumlist)
-
+        posts = current_user.followed_review().order_by(Review.timestamp.desc()).all()
+        return render_template("followed_rev.html", posts=posts)
     else:
         return render_template('info.html')
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -405,7 +397,7 @@ def user(username):
     u = db.session.query(User.id).filter(User.username == username).scalar()
     reviews = Review.query.filter_by(user_id=user.id)
     albumlist = db.session.query(List).filter(List.user_id == u).all()
-    return render_template("user.html", reviews=reviews, user=user, albumlist=albumlist)
+    return render_template("user.html", posts=reviews, user=user, albumlist=albumlist)
 
 
 @app.route('/user/<username>/list/<int:id>')
@@ -613,3 +605,54 @@ def get_adminOn():
 def publicLists():
     albumlist = db.session.query(List).filter(List.type == 0).all()
     return render_template("public_list.html", publicLists=albumlist)
+
+
+@app.route('/top/', methods=['GET'])
+def top():
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.count(Rating.id).label('val')).join(Rating)
+              .group_by(Record.id).order_by(desc('val')).all())
+
+    print(albums)
+    r_type = 'records'
+    return render_template('top_list.html', albums=albums, type=r_type, val_desc='Liczba ocen')
+
+
+@app.route('/top/rats', methods=['GET'])
+def top_rats():
+
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.count(Rating.id).label('val')).join(Rating)
+              .group_by(Record.id).order_by(desc('val')).all())
+
+    r_type = 'records'
+    return render_template('top_list.html', albums=albums, type=r_type, val_desc='Liczba ocen')
+
+
+@app.route('/top/revs', methods=['GET'])
+def top_revs():
+
+    albums = (db.session.query(Record.artist, Record.title,  Record.id, func.count(Review.id).label('val')).join(Review)
+              .group_by(Record.id).order_by(desc('val')).all())
+
+    print(albums)
+    r_type = 'records'
+    return render_template('top_list.html', albums=albums, type=r_type, val_desc='Liczba recenzji')
+
+
+@app.route('/top/avg', methods=['GET'])
+def top_avg():
+
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.avg(Rating.rate).label('val')).join(Rating)
+              .group_by(Record.id).order_by(desc('val')).all())
+
+    r_type = 'records'
+    return render_template('top_list.html', albums=albums, type=r_type, val_desc='Średnia ocena')
+
+
+@app.route('/top/users-rev', methods=['GET'])
+def top_users_rev():
+    users = (db.session.query(User.username, User.id, func.count(Review.id).label('val')).join(Review)
+             .group_by(User.id).order_by(desc('val')).all())
+    r_type = 'users'
+
+    return render_template('top_list.html', albums=users, type=r_type, val_desc='Liczba recenzji')
+
