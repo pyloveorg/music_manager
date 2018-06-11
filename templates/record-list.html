@@ -100,21 +100,23 @@
                             <button type="submit" class="btn btn-danger">Usuń</button>
                         </form>
                     </td>
-                        {% if list_album %}
-                        <td>
-                            <form action="/album-list" method="post" class="form-inline formtypelist">
-                                <input type="hidden" name="record-id" value="{{ record.id }}">
-                                <select class="form-control" id="selectListType" name="album-list">
-                                    <option disabled selected>Zapisz album do listy:</option>
-                                    {% for list in list_album %}
-                                        <option value="{{ list.id }}">Lista: {{ list.title }}</option>
-                                    {% endfor %}
-                                </select>
-                              <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
-                            </form>
-                        </td>
-                        {% endif %}
                     {% endif %}
+
+                    {% if list_album %}
+                    <td>
+                        <form action="/album-list" method="post" class="form-inline formtypelist">
+                            <input type="hidden" name="record-id" value="{{ record.id }}">
+                            <select class="form-control" id="selectListType" name="album-list">
+                                <option value="-1"/>Zapisz album do listy:</optionvalue>
+                                {% for list in list_album %}
+                                    <option value="{{ list.id }}">Lista: {{ list.title }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
+                        </form>
+                    </td>
+                    {% endif %}
+
                 </tr>
             {% endfor %}
         </table>

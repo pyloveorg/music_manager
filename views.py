@@ -189,6 +189,9 @@ def get_records():
 def save_album_list():
     if current_user.is_authenticated:
         list_id = request.form['album-list']
+        if list_id == '-1':
+            flash("Nie wybrałeś typu listy!", 'danger')
+            return redirect('/records/')
         list_id_query = List.query.get(list_id)
         record_id = request.form['record-id']
         record_id_query = Record.query.get(record_id)
@@ -313,16 +316,18 @@ def save_list_type():
         title = request.form['list-name']
         type = request.form['list-type']
         if type == '0':
-            flash('Twoja lista jest publiczna')
+            flash('Twoja lista jest publiczna', category='success')
         elif type == '1':
-            flash('Twoja lista jest prywatna')
+            flash('Twoja lista jest prywatna', category='success')
         elif type == '2':
-            flash('Twoja lista jest widoczna tylko dla znajomych')
+            flash('Twoja lista jest widoczna tylko dla znajomych', category='success')
+        else:
+            flash('Nie wybrałeś typu listy', category='danger')
 
         #sprawdzanie czy nazwa listy już istnieje
         check_list_exist = db.session.query(List).filter(List.user_id == u, List.title == title, List.type == type).first()
         if check_list_exist:
-            flash('Lista o tej nazwie i typie już istnieje!')
+            flash('Lista o tej nazwie i typie już istnieje!', category='danger')
         else:
             tplist = List(title=title, type=type, user_id=u)
             db.session.add(tplist)
