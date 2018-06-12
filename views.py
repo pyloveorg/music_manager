@@ -21,8 +21,15 @@ class ServerError(Exception):
 @app.route('/', methods=['GET', 'POST'])
 def info():
     if 'username' in session:
-        posts = current_user.followed_review().order_by(Review.timestamp.desc()).all()
-        return render_template("followed_rev.html", posts=posts)
+        page = request.args.get('page', 1, type=int)
+        posts = current_user.followed_review().paginate(
+            page, app.config['POSTS_PER_PAGE'], False)
+        next_url = url_for('info', page=posts.next_num) \
+            if posts.has_next else None
+        prev_url = url_for('info', page=posts.prev_num) \
+            if posts.has_prev else None
+        return render_template("followed_rev.html", posts=posts.items,
+                                next_url=next_url, prev_url=prev_url)
     else:
         return render_template('info.html')
 
@@ -70,8 +77,15 @@ def profile():
 @app.route('/reviews/', methods=['GET'])
 @login_required
 def explore():
-    posts = Review.query.order_by(Review.timestamp.desc()).all()
-    return render_template("all_reviews.html", posts=posts)
+    page = request.args.get('page', 1, type=int)
+    posts = Review.query.order_by(Review.timestamp.desc()).paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('explore', page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('explore', page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template("all_reviews.html", posts=posts.items,
+                            next_url=next_url, prev_url=prev_url)
 
 
 @app.route('/logout')
@@ -399,10 +413,18 @@ def get_reviews(id):
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
     u = db.session.query(User.id).filter(User.username == username).scalar()
-    reviews = Review.query.filter_by(user_id=user.id)
+    posts = Review.query.filter_by(user_id=user.id).paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
     albumlist = db.session.query(List).filter(List.user_id == u).all()
-    return render_template("user.html", posts=reviews, user=user, albumlist=albumlist)
+    next_url = url_for('user', username=user.username, page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('user', username=user.username, page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template("user.html", posts=posts.items, user=user,
+                            next_url=next_url, prev_url=prev_url,
+                            albumlist=albumlist)
 
 
 @app.route('/user/<username>/list/<int:id>')
