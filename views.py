@@ -558,7 +558,7 @@ def search():
 def get_api_data():
 
     rows = []
-    for count in range(1, 50):
+    for count in range(1, 1000):
         url = 'https://api.discogs.com/releases/' + str(count)
         response = requests.get(url)
         jsonText = response.json()
