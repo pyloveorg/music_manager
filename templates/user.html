@@ -131,12 +131,12 @@
                     <table class="table table-bordered">
                       <thead>
                         <tr>
-                          <th scope="col">Dla znajomych:</th>
+                          <th scope="col">Dla obserwujących:</th>
                         </tr>
                       </thead>
                       <tbody>
                       {% for list in albumlist %}
-                            {% if list.type == 2 %}
+                            {% if list.type == 2 and current_user.is_following(user) %}
                                 <tr>
                                   <td><a href="/user/{{ user.username }}/list/{{ list.id }}">{{ list.title }}</a></td>
                                 </tr>
