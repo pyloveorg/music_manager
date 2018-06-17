@@ -58,7 +58,7 @@
                     <select class="form-control" id="selectListType" name="list-type">                                     <option selected disabled>Typ widoczności listy:</option>
                       <option value="0">Publiczna</option>
                       <option value="1">Prywatna</option>
-                      <option value="2">Tylko dla znajomych</option>
+                      <option value="2">Tylko dla obserwujących</option>
                     </select>
                  </div>
               <button type="submit" name="listtypesubmit" class="btn btn-primary">Zapisz</button>
@@ -115,12 +115,12 @@
                     <table class="table table-bordered">
                       <thead>
                         <tr>
-                          <th scope="col">Dla znajomych:</th>
+                          <th scope="col">Dla obserwujących:</th>
                         </tr>
                       </thead>
                       <tbody>
                       {% for list in albumlist %}
-                            {% if list.type == 2 %}
+                            {% if list.type == 2 and current_user.is_following(user) %}
                                 <tr>
                                   <td><a href="/user/{{ user.username }}/list/{{ list.id }}">{{ list.title }}</a></td>
                                 </tr>
