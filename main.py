@@ -12,6 +12,7 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['POSTS_PER_PAGE'] = 3
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 db = SQLAlchemy()
 db.app = app
@@ -26,4 +27,4 @@ app.static_path = path.join(path.abspath(__file__), 'static')
 
 if __name__ == '__main__':
     from views import *
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)

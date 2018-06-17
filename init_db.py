@@ -51,6 +51,7 @@ def db_start():
     db.session.add(user_4)
     db.session.commit()
 
+    '''
     record_1 = models.Record(title='Black Sabbath', artist='Black Sabbath')
     record_2 = models.Record(title='The Doors', artist='The Doors')
     record_3 = models.Record(title='Led Zeppelin', artist='Led Zeppelin')
@@ -68,6 +69,7 @@ def db_start():
     db.session.add(record_7)
     db.session.add(record_8)
     db.session.commit()
+    '''
 
 if __name__ == '__main__':
     db_start()

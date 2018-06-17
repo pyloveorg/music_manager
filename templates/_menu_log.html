@@ -5,14 +5,19 @@
             <li class="nav-item{% if page_id == 'records' %} active{% endif %}">
                 <a class="nav-link" href="{{ url_for('get_records') }}">Albumy</a>
             </li>
-            <li class="nav-item{% if page_id == 'api' %} active{% endif %}">
-                <a class="nav-link" href="{{ url_for('get_api_data') }}">API</a>
+            <li class="nav-item{% if page_id == 'reviews' %} active{% endif %}">
+                <a class="nav-link" href="{{ url_for('explore') }}">Wszystkie Recenzje</a>
+            </li>
+            <li class="nav-item{% if page_id == '' %} active{% endif %}">
+                <a class="nav-link" href="{{ url_for('info') }}">Obserwowane Recenzje</a>
+            </li>
+            <li class="nav-item{% if page_id == 'publicLists' %} active{% endif %}">
+                <a class="nav-link" href="{{ url_for('publicLists') }}">Listy publiczne</a>
+            </li>
+            <li class="nav-item{% if page_id == 'top' %} active{% endif %}">
+                <a class="nav-link" href="{{ url_for('top') }}">Rankingi</a>
             </li>
         </ul>
-
     </div>
-
-
-
 
 </nav>

@@ -5,6 +5,7 @@ from main import app, db, bcrypt, lm
 from models import User, Record, Review, Rating, EditProfileForm, List, record_list # KZ
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy import desc
 from flask_login import current_user, login_required, login_user, logout_user
 from datetime import datetime
 import requests
@@ -19,13 +20,25 @@ class ServerError(Exception):
 
 @app.route('/', methods=['GET', 'POST'])
 def info():
-    return render_template('info.html')
+    if 'username' in session:
+        page = request.args.get('page', 1, type=int)
+        posts = current_user.followed_review().paginate(
+            page, app.config['POSTS_PER_PAGE'], False)
+        next_url = url_for('info', page=posts.next_num) \
+            if posts.has_next else None
+        prev_url = url_for('info', page=posts.prev_num) \
+            if posts.has_prev else None
+        return render_template("followed_rev.html", posts=posts.items,
+                                next_url=next_url, prev_url=prev_url)
+    else:
+        return render_template('info.html')
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if 'username' in session:
-        return redirect(url_for('profile'))
+        return redirect(url_for('info'))
 
     if request.method == 'POST':
         username_form = request.form.get('username')
@@ -46,8 +59,11 @@ def login():
             return render_template('login.html')
 
         session['username'] = username_form
+        session.pop('adminMode', None)
+        if (szukany_uzytkownik.is_admin()):
+            session['admin'] = True
         login_user(szukany_uzytkownik)
-        return redirect('/profile')
+        return redirect(url_for('info'))
     return render_template('login.html')
 
 
@@ -58,9 +74,25 @@ def profile():
     return render_template('profile.html', tekst="witamy ")
 
 
+@app.route('/reviews/', methods=['GET'])
+@login_required
+def explore():
+    page = request.args.get('page', 1, type=int)
+    posts = Review.query.order_by(Review.timestamp.desc()).paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('explore', page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('explore', page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template("all_reviews.html", posts=posts.items,
+                            next_url=next_url, prev_url=prev_url)
+
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('admin', None)
+    session.pop('adminMode', None)
     logout_user()
     return redirect(url_for('info'))
 
@@ -92,7 +124,7 @@ def register():
             new_user = User(username=new_username, password=new_password, email=new_email)
             db.session.add(new_user)
             db.session.commit()
-            return redirect('/login')   #### czy tu RETURN ?
+            return redirect('/login')
 
         except ServerError as err:
             flash(str(err), 'danger')
@@ -171,6 +203,9 @@ def get_records():
 def save_album_list():
     if current_user.is_authenticated:
         list_id = request.form['album-list']
+        if list_id == '-1':
+            flash("Nie wybrałeś typu listy!", 'danger')
+            return redirect('/records/')
         list_id_query = List.query.get(list_id)
         record_id = request.form['record-id']
         record_id_query = Record.query.get(record_id)
@@ -204,6 +239,27 @@ def new_record():
         flash("Dana pozycja już istnieje w bazie", 'warning')
         records = Record.query.all()
         return render_template('record-list.html', records=records)
+
+    #pobieranie pozostałych danych
+    genres = api_check['genres']
+    styles = api_check['styles']
+    country = api_check['country']
+    year = api_check['year']
+
+    genresString = ''
+    if (genres is not None):
+        for genre in genres:
+            genresString += str(genre) + ';'
+
+    stylesString = ''
+    if (styles is not None):
+        for style in styles:
+            stylesString += str(style) + ';'
+
+    new_record.genres = genresString
+    new_record.styles = stylesString
+    new_record.country = country
+    new_record.year = year
 
     db.session.add(new_record)
     db.session.commit()
@@ -274,16 +330,18 @@ def save_list_type():
         title = request.form['list-name']
         type = request.form['list-type']
         if type == '0':
-            flash('Twoja lista jest publiczna')
+            flash('Twoja lista jest publiczna', category='success')
         elif type == '1':
-            flash('Twoja lista jest prywatna')
+            flash('Twoja lista jest prywatna', category='success')
         elif type == '2':
-            flash('Twoja lista jest widoczna tylko dla znajomych')
+            flash('Twoja lista jest widoczna tylko dla znajomych', category='success')
+        else:
+            flash('Nie wybrałeś typu listy', category='danger')
 
         #sprawdzanie czy nazwa listy już istnieje
         check_list_exist = db.session.query(List).filter(List.user_id == u, List.title == title, List.type == type).first()
         if check_list_exist:
-            flash('Lista o tej nazwie i typie już istnieje!')
+            flash('Lista o tej nazwie i typie już istnieje!', category='danger')
         else:
             tplist = List(title=title, type=type, user_id=u)
             db.session.add(tplist)
@@ -355,10 +413,18 @@ def get_reviews(id):
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
     u = db.session.query(User.id).filter(User.username == username).scalar()
-    reviews = current_user.followed_review().all()
+    posts = Review.query.filter_by(user_id=user.id).paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
     albumlist = db.session.query(List).filter(List.user_id == u).all()
-    return render_template("user.html", reviews=reviews, user=user, albumlist=albumlist)
+    next_url = url_for('user', username=user.username, page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('user', username=user.username, page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template("user.html", posts=posts.items, user=user,
+                            next_url=next_url, prev_url=prev_url,
+                            albumlist=albumlist)
 
 
 @app.route('/user/<username>/list/<int:id>')
@@ -492,7 +558,7 @@ def search():
 def get_api_data():
 
     rows = []
-    for count in range(1, 50):
+    for count in range(1, 1000):
         url = 'https://api.discogs.com/releases/' + str(count)
         response = requests.get(url)
         jsonText = response.json()
@@ -533,8 +599,87 @@ def get_api_data():
                     db.session.add(plyta)
                     db.session.commit()
 
-
     return render_template('api.html', rows=rows)
 
 
+
+@app.route('/regulations', methods=['GET'])
+def get_regulations():
+    return render_template('regulations.html')
+
+
+@app.route('/creators', methods=['GET'])
+def get_creators():
+    return render_template('creators.html')
+
+
+@app.route('/adminOff', methods=['GET'])
+@login_required
+def get_adminOff():
+    session.pop('adminMode', None)
+    return redirect('/records/')
+
+
+@app.route('/adminOn', methods=['GET'])
+@login_required
+def get_adminOn():
+    session['adminMode'] = True
+    return redirect('/records/')
+
+
+@app.route('/publicLists/', methods=['GET'])
+@login_required
+def publicLists():
+    albumlist = db.session.query(List).filter(List.type == 0).all()
+    return render_template("public_list.html", publicLists=albumlist)
+
+
+@app.route('/top/', methods=['GET'])
+def top():
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.count(Rating.id).label('val')).join(Rating)
+              .group_by(Record.id).order_by(desc('val')).all())
+
+    print(albums)
+    r_type = 'records'
+    return render_template('top_list.html', albums=albums, type=r_type, val_desc='Liczba ocen')
+
+
+@app.route('/top/rats', methods=['GET'])
+def top_rats():
+
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.count(Rating.id).label('val')).join(Rating)
+              .group_by(Record.id).order_by(desc('val')).all())
+
+    r_type = 'records'
+    return render_template('top_list.html', albums=albums, type=r_type, val_desc='Liczba ocen')
+
+
+@app.route('/top/revs', methods=['GET'])
+def top_revs():
+
+    albums = (db.session.query(Record.artist, Record.title,  Record.id, func.count(Review.id).label('val')).join(Review)
+              .group_by(Record.id).order_by(desc('val')).all())
+
+    print(albums)
+    r_type = 'records'
+    return render_template('top_list.html', albums=albums, type=r_type, val_desc='Liczba recenzji')
+
+
+@app.route('/top/avg', methods=['GET'])
+def top_avg():
+
+    albums = (db.session.query(Record.artist, Record.title, Record.id, func.avg(Rating.rate).label('val')).join(Rating)
+              .group_by(Record.id).order_by(desc('val')).all())
+
+    r_type = 'records'
+    return render_template('top_list.html', albums=albums, type=r_type, val_desc='Średnia ocena')
+
+
+@app.route('/top/users-rev', methods=['GET'])
+def top_users_rev():
+    users = (db.session.query(User.username, User.id, func.count(Review.id).label('val')).join(Review)
+             .group_by(User.id).order_by(desc('val')).all())
+    r_type = 'users'
+
+    return render_template('top_list.html', albums=users, type=r_type, val_desc='Liczba recenzji')
 
